@@ -32,6 +32,7 @@ vars:
   - sa2_g04a
   - sa2_g04b
   - sa2_g05
+  - sa2_g06
   - sa2_g07
   - sa2_g08
   - sa2_g09a
@@ -52,9 +53,11 @@ vars:
   - sa2_g17a
   - sa2_g17b
   - sa2_g17c
+  - sa2_g22
   - sa2_g27a
   - sa2_g27b
   - sa2_g29
+  - sa2_g35
   - sa2_g36
   - sa2_g37
   - sa2_g46a
@@ -64,6 +67,10 @@ vars:
   - sa2_g50a
   - sa2_g50b
   - sa2_g50c
+  - sa2_g54a
+  - sa2_g54b
+  - sa2_g54c
+  - sa2_g54d
   - sa2_g60a
   - sa2_g60b
 models:

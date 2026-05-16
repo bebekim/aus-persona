@@ -9,3 +9,5 @@ Repository changes worth human review should be summarized here.
   interpreted G01 profile estimates.
 - Added a fail-closed semantic catalog guardrail for persona-worthy SA2 Census
   sections, including `aus-personas census worthy` inspection output.
+- Added all core persona seed `sa2_g*` Census topics to the dbt first-pass
+  observation pipeline with coverage tests for table presence and row counts.

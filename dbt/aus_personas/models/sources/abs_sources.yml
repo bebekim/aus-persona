@@ -21,6 +21,7 @@ sources:
       - name: sa2_g04a
       - name: sa2_g04b
       - name: sa2_g05
+      - name: sa2_g06
       - name: sa2_g07
       - name: sa2_g08
       - name: sa2_g09a
@@ -41,9 +42,11 @@ sources:
       - name: sa2_g17a
       - name: sa2_g17b
       - name: sa2_g17c
+      - name: sa2_g22
       - name: sa2_g27a
       - name: sa2_g27b
       - name: sa2_g29
+      - name: sa2_g35
       - name: sa2_g36
       - name: sa2_g37
       - name: sa2_g46a
@@ -53,6 +56,10 @@ sources:
       - name: sa2_g50a
       - name: sa2_g50b
       - name: sa2_g50c
+      - name: sa2_g54a
+      - name: sa2_g54b
+      - name: sa2_g54c
+      - name: sa2_g54d
       - name: sa2_g60a
       - name: sa2_g60b
 

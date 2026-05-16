@@ -10,13 +10,16 @@ case {{ logical_code_expr }}
     when 'G13' then 'language_home_by_english_proficiency_sex'
     when 'G16' then 'school_completion_by_age_sex'
     when 'G17' then 'personal_income_weekly_by_age_sex'
+    when 'G22' then 'defence_force_service_by_age_sex'
     when 'G27' then 'household_relationship_by_age_sex'
     when 'G29' then 'family_composition'
+    when 'G35' then 'household_composition_by_persons_usually_resident'
     when 'G36' then 'dwelling_structure'
     when 'G37' then 'tenure_landlord_by_dwelling_structure'
     when 'G46' then 'labour_force_status_by_age_sex'
     when 'G49' then 'qualification_level_by_age_sex'
     when 'G50' then 'field_of_study_by_age_sex'
+    when 'G54' then 'industry_by_age_sex'
     when 'G60' then 'occupation_by_age_sex'
     else lower(regexp_replace(trim(coalesce({{ table_name_expr }}, 'unknown')), '[^a-zA-Z0-9]+', '_', 'g'))
 end
