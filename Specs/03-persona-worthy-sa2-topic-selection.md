@@ -240,6 +240,107 @@ and are the only initial `sa2_g*` topics in scope.
 | `G54` | Industry of Employment by Age by Sex | `industry`; conditions occupation/professional persona. | B |
 | `G60` | Occupation by age by Sex | `occupation`; primary work identity feature. | A |
 
+## Full G-Table Persona Triage
+
+The ABS `G*` tables are not equally useful for individual persona generation.
+Use the following triage when deciding which `sa2_g*` topics deserve semantic
+long tables, sampler marts, or only validation/context coverage.
+
+### Core Persona Seed Tables
+
+These tables most directly support one synthetic Australian resident row. They
+should be considered before broader enrichment tables.
+
+| Topic | Metadata title | Persona use |
+| --- | --- | --- |
+| `G04` | Age by Sex | Base `age_band` and `sex` distribution. |
+| `G05` | Registered Marital Status by Age by Sex | `marital_status`. |
+| `G06` | Social Marital Status by Age by Sex | Partnering context and family plausibility. |
+| `G07` | Indigenous Status by Age by Sex | `indigenous_status`, guarded for sensitivity and small counts. |
+| `G08` | Ancestry by Country of Birth of Parents | `ancestry` and cultural background context. |
+| `G09` | Country of Birth of Person by Age by Sex | `country_of_birth`; preferred over G01 birthplace summaries. |
+| `G13` | Language Used at Home by Proficiency in Spoken English by Sex | `language_used_at_home`, `english_proficiency`. |
+| `G16` | Highest Year of School Completed by Age by Sex | School education baseline. |
+| `G17` | Total Personal Income (Weekly) by Age by Sex | `income_band`, conditioned by age and sex. |
+| `G22` | Australian Defence Force Service by Age by Sex | `military_status` analogue. |
+| `G27` | Relationship in Household by Age by Sex | Household role and family relationship. |
+| `G29` | Family Composition | `family_type`; family-level conditioning. |
+| `G35` | Household Composition by Number of Persons Usually Resident | Household type and size context. |
+| `G36` | Dwelling Structure | `housing_type`. |
+| `G37` | Tenure and Landlord Type by Dwelling Structure | Tenure and housing stability context. |
+| `G46` | Labour Force Status by Age by Sex | Employment participation state. |
+| `G49` | Highest Non-School Qualification: Level of Education by Age by Sex | Qualification level. |
+| `G50` | Highest Non-School Qualification: Field of Study by Age by Sex | Field of study. |
+| `G54` | Industry of Employment by Age by Sex | Industry context for working personas. |
+| `G60` | Occupation by age by Sex | Primary occupation/work identity feature. |
+
+### Enrichment and Conditioning Tables
+
+These tables can improve plausibility, narrative texture, or validation after
+the core seed chain exists. They should not block the first persona MVP.
+
+| Topic | Metadata title | Persona use |
+| --- | --- | --- |
+| `G10` | Country of Birth of Person by Year of Arrival in Australia | Migration recency for overseas-born personas. |
+| `G11` | Proficiency in Spoken English by Year of Arrival in Australia by Age | English proficiency conditioning. |
+| `G14` | Religious Affiliation by Sex | Optional cultural context; sensitive. |
+| `G15` | Type of Educational Institution Attending by Age by Sex | Student status. |
+| `G18` | Core Activity Need for Assistance by Age by Sex | Support need/disability context; sensitive. |
+| `G19` | Type of Long-Term Health Condition by Age by Sex | Health context; sensitive. |
+| `G20` | Count of Selected Long-Term Health Conditions by Age by Sex | Health validation/conditioning. |
+| `G21` | Type of Long-Term Health Condition by Selected Person Characteristics | Health consistency checks. |
+| `G23` | Voluntary Work for an Organisation or Group by Age by Sex | Community participation. |
+| `G24` | Unpaid Domestic Work: Number of Hours by Age by Sex | Household role texture. |
+| `G25` | Unpaid Assistance to a Person with a Disability, Health Condition or Due to Old Age by Age by Sex | Carer role. |
+| `G26` | Unpaid Child Care by Age by Sex | Parenting and care role. |
+| `G28` | Number of Children Ever Born | Family realism for relevant cohorts. |
+| `G32` | Total Family Income (Weekly) by Family Composition | Family economic validation. |
+| `G33` | Total Household Income (Weekly) by Household Composition | Household economic validation. |
+| `G34` | Number of Motor Vehicles by Dwellings | Suburban/lifestyle context. |
+| `G38` | Mortgage Repayment (Monthly) by Dwelling Structure | Housing affordability context. |
+| `G39` | Mortgage Repayment (Monthly) by Family Composition | Family housing affordability context. |
+| `G40` | Rent (Weekly) by Landlord Type | Rental affordability context. |
+| `G41` | Dwelling Structure by Number of Bedrooms | Bedroom/housing realism. |
+| `G42` | Dwelling Structure by Household Composition and Family Composition | Household/dwelling consistency checks. |
+| `G43` | Selected Labour Force Education and Migration Characteristics by Sex | Summary validation/helper context. |
+| `G44` | Place of Usual Residence 1 Year Ago by Sex | Recent mobility. |
+| `G45` | Place of Usual Residence 5 Years Ago by Sex | Longer-term mobility. |
+| `G51` | Highest Non-School Qualification: Field of Study by Occupation by Sex | Education/occupation consistency. |
+| `G52` | Highest Non-School Qualification: Level of Education by Occupation by Sex | Education/occupation consistency. |
+| `G53` | Highest Non-School Qualification: Level of Education by Industry of Employment by Sex | Education/industry consistency. |
+| `G55` | Industry of Employment by Hours Worked by Sex | Work pattern validation. |
+| `G56` | Industry of Employment by Occupation | Industry/occupation consistency. |
+| `G57` | Total Family Income by Labour Force Status of Partners for Couple Families with No Children | Family economic validation. |
+| `G58` | Total Family Income by Labour Force Status of Parents/Partners for Couple Families with Children | Family economic validation. |
+| `G59` | Total Family Income by Labour Force Status of Parent for One Parent Families | One-parent family economic validation. |
+| `G61` | Occupation by Hours Worked by Sex | Work pattern validation. |
+| `G62` | Method of Travel to Work by Sex | Commute/lifestyle context. |
+
+### Summary, QA, or Deferred Tables
+
+These tables are useful for checks or narrow use cases, but should not be the
+main source for individual persona sampling.
+
+| Topic | Metadata title | Decision |
+| --- | --- | --- |
+| `G01` | Selected Person Characteristics by Sex | Use selected sections only. Treat most coarse totals and summaries as QA/context. |
+| `G02` | Selected Medians and Averages | Area-level medians/averages; validation or neighbourhood flavour only. |
+| `G03` | Place of Usual Residence by Place of Enumeration on Census Night by Age | Defer unless modelling visitors or enumeration-night movement. |
+| `G12` | Proficiency in Spoken English of Parents by Age of Dependent Children | Niche family/child conditioning; defer. |
+| `G30` | Family Composition and Country of Birth of Parents by Age of Dependent Children | Detailed family-child context; defer until family modelling matures. |
+| `G31` | Family Blending | Defer unless blended-family personas become explicit scope. |
+| `G47` | Labour Force Status by Sex of Parents by Age of Dependent Children for Couple Families | Defer to family-specific modelling. |
+| `G48` | Labour Force Status by Sex of Parent by Age of Dependent Children for One Parent Families | Defer to family-specific modelling. |
+
+For a Willoughby/Chatswood hackathon MVP, use this reduced set:
+
+```text
+G04, G05, G08, G09, G13, G17, G27, G35, G36, G46, G49, G50, G60
+```
+
+This keeps the first persona rows useful without over-modelling every ABS
+profile table.
+
 ## Column-Worthiness Rules
 
 Inside a worthy topic, not all columns are sampler columns.
