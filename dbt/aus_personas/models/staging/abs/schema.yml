@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: stg_abs__metadata_tables
+    columns:
+      - name: logical_table_code
+        data_tests:
+          - not_null
+          - unique
+      - name: logical_table_name
+        data_tests:
+          - not_null
+      - name: source_profile
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["G", "P", "W", "I", "T"]
+
+  - name: stg_abs__metadata_stats
+    columns:
+      - name: sequential_id
+        data_tests:
+          - not_null
+          - unique
+      - name: raw_column
+        data_tests:
+          - not_null
+      - name: physical_table_suffix
+        data_tests:
+          - not_null
+      - name: logical_table_code
+        data_tests:
+          - not_null
+
+  - name: stg_abs__sa2_geography
+    columns:
+      - name: sa2_code
+        data_tests:
+          - not_null
+          - unique
+      - name: sa2_name
+        data_tests:
+          - not_null
+      - name: state_name
+        data_tests:
+          - not_null

@@ -1,0 +1,138 @@
+tables:
+  G01:
+    name: selected_person_characteristics_by_sex
+    description: Wide ABS summary table of selected person characteristics by sex.
+    default_physical_tables: [sa2_g01]
+    sections:
+      total_persons_by_sex:
+        description: Total persons by sex.
+        raw_column_ranges: ["g1-g3"]
+        grain: "sa2 x sex"
+        feature_name: total_persons
+        value_column: sex
+        is_sampler_candidate: false
+        total_policy: "validation only; persons row is aggregate across sex"
+        sampler:
+          tier: D
+          guardrail:
+            sample: deny
+            condition: deny
+            validate: allow_validate
+            generate: deny
+          reason: "aggregate total; useful for validation, not persona sampling"
+      age_group_by_sex:
+        description: Broad age groups by sex.
+        raw_column_ranges: ["g4-g36"]
+        grain: "sa2 x age_band x sex"
+        feature_name: age_group
+        value_column: age_band
+        is_sampler_candidate: true
+        total_policy: "exclude sex=Persons aggregate rows from sampling"
+        sampler:
+          tier: A
+          guardrail:
+            sample: allow
+            condition: allow
+            validate: allow
+            generate: deny
+          reason: "core age and sex distribution for seed rows; aggregate sex=Persons rows remain excluded"
+          persona_fields: [age, sex]
+          conditioning_fields: [sa2_code]
+          promotion_status: candidate
+      census_night_location_by_sex:
+        description: Counted at home or elsewhere in Australia on Census night by sex.
+        raw_column_ranges: ["g37-g42"]
+        grain: "sa2 x census_night_location x sex"
+        feature_name: census_night_location
+        value_column: category
+        is_sampler_candidate: false
+        total_policy: "validation/context only; exclude sex=Persons aggregate rows from sampling"
+      indigenous_summary_by_sex:
+        description: Summary Aboriginal and Torres Strait Islander categories by sex.
+        raw_column_ranges: ["g43-g54"]
+        grain: "sa2 x indigenous_summary x sex"
+        feature_name: indigenous_summary
+        value_column: category
+        is_sampler_candidate: true
+        total_policy: "exclude explicit totals and sex=Persons aggregate rows from sampling"
+      birthplace_summary_by_sex:
+        description: Australia or elsewhere birthplace summary by sex.
+        raw_column_ranges: ["g55-g60"]
+        grain: "sa2 x birthplace_summary x sex"
+        feature_name: birthplace_summary
+        value_column: category
+        is_sampler_candidate: false
+        total_policy: "coarse validation/context only; prefer detailed country of birth topic for sampling"
+        sampler:
+          tier: C
+          guardrail:
+            sample: deny
+            condition: allow_context
+            validate: allow_validate
+            generate: deny
+          reason: "coarse birthplace summary; prefer detailed country-of-birth topic for sampling"
+      language_summary_by_sex:
+        description: English-only or other-language-at-home summary by sex.
+        raw_column_ranges: ["g61-g66"]
+        grain: "sa2 x language_summary x sex"
+        feature_name: language_summary
+        value_column: category
+        is_sampler_candidate: false
+        total_policy: "coarse validation/context only; prefer detailed language topic for sampling"
+      citizenship_by_sex:
+        description: Australian citizenship by sex.
+        raw_column_ranges: ["g67-g69"]
+        grain: "sa2 x citizenship x sex"
+        feature_name: citizenship
+        value_column: category
+        is_sampler_candidate: false
+        total_policy: "validation/context only; persons row is aggregate across sex"
+      education_attendance_by_sex:
+        description: Education institution attendance age bands by sex.
+        raw_column_ranges: ["g70-g84"]
+        grain: "sa2 x education_attendance_age_band x sex"
+        feature_name: education_attendance
+        value_column: category
+        is_sampler_candidate: false
+        total_policy: "validation/context only; not adult-persona education attainment"
+      school_completion_by_sex:
+        description: Highest year of school completed by sex.
+        raw_column_ranges: ["g85-g102"]
+        grain: "sa2 x school_completion x sex"
+        feature_name: school_completion
+        value_column: category
+        is_sampler_candidate: true
+        total_policy: "exclude explicit totals and sex=Persons aggregate rows from sampling"
+      dwelling_residence_summary_by_sex:
+        description: Persons in occupied private dwellings or other dwellings by sex.
+        raw_column_ranges: ["g103-g108"]
+        grain: "sa2 x dwelling_residence_summary x sex"
+        feature_name: dwelling_residence_summary
+        value_column: category
+        is_sampler_candidate: false
+        total_policy: "validation/context only; prefer dwelling and household topics for sampling"
+
+  G17:
+    name: personal_income_weekly_by_age_sex
+    description: Personal weekly income by age and sex.
+    default_physical_tables: [sa2_g17a, sa2_g17b, sa2_g17c]
+    sections:
+      personal_income:
+        description: Personal weekly income by SA2, income band, age band, and sex.
+        raw_column_ranges: ["all"]
+        grain: "sa2 x income_band x age_band x sex"
+        feature_name: personal_income
+        value_column: category
+        is_sampler_candidate: true
+        total_policy: "exclude explicit totals and sex=Persons aggregate rows from sampling"
+        sampler:
+          tier: A
+          guardrail:
+            sample: allow
+            condition: allow
+            validate: allow
+            generate: deny
+          reason: "core income distribution by age and sex; totals stay validation-only"
+          persona_fields: [income_band]
+          conditioning_fields: [sa2_code, age_band, sex]
+          promotion_status: candidate

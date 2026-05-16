@@ -1,0 +1,98 @@
+name: aus_personas
+version: 0.1.0
+config-version: 2
+profile: aus_personas
+model-paths:
+- models
+analysis-paths:
+- analysis
+test-paths:
+- tests
+seed-paths:
+- seeds
+macro-paths:
+- macros
+docs-paths:
+- documents
+snapshot-paths:
+- snapshots
+target-path: target
+clean-targets:
+- target
+- dbt_packages
+- logs
+vars:
+  census_year: 2021
+  census_data_schema: census_2021_data
+  census_boundary_schema: census_2021_bdys_gda94
+  geography_level: sa2
+  sa2_boundary_table: sa2_2021_aust_gda94
+  first_pass_sa2_tables:
+  - sa2_g01
+  - sa2_g04a
+  - sa2_g04b
+  - sa2_g05
+  - sa2_g07
+  - sa2_g08
+  - sa2_g09a
+  - sa2_g09b
+  - sa2_g09c
+  - sa2_g09d
+  - sa2_g09e
+  - sa2_g09f
+  - sa2_g09g
+  - sa2_g09h
+  - sa2_g13a
+  - sa2_g13b
+  - sa2_g13c
+  - sa2_g13d
+  - sa2_g13e
+  - sa2_g16a
+  - sa2_g16b
+  - sa2_g17a
+  - sa2_g17b
+  - sa2_g17c
+  - sa2_g27a
+  - sa2_g27b
+  - sa2_g29
+  - sa2_g36
+  - sa2_g37
+  - sa2_g46a
+  - sa2_g46b
+  - sa2_g49a
+  - sa2_g49b
+  - sa2_g50a
+  - sa2_g50b
+  - sa2_g50c
+  - sa2_g60a
+  - sa2_g60b
+models:
+  aus_personas:
+    +materialized: view
+    +tags:
+    - aus_personas
+    staging:
+      +materialized: view
+      +tags:
+      - staging
+      abs:
+        +tags:
+        - abs
+    intermediate:
+      +materialized: view
+      +tags:
+      - intermediate
+      abs:
+        +tags:
+        - abs
+      g01_selected_person_characteristics:
+        +tags:
+        - g01
+        - selected_person_characteristics
+    marts:
+      +materialized: table
+      +tags:
+      - mart
+      core:
+        +tags:
+        - core

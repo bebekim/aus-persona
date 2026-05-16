@@ -1,0 +1,36 @@
+selectors:
+  - name: source_plumbing
+    description: Build the ABS metadata, geography, and generic observation plumbing.
+    definition:
+      union:
+        - method: tag
+          value: staging
+        - method: tag
+          value: abs
+
+  - name: g01_profile
+    description: Build and test G01 selected-person-characteristics semantic models.
+    definition:
+      method: tag
+      value: g01
+
+  - name: g17_income
+    description: Build and test G17 personal-income models.
+    definition:
+      method: tag
+      value: g17
+
+  - name: pgm_marts
+    description: Build sampler-facing PGM marts.
+    definition:
+      method: tag
+      value: pgm
+
+  - name: rockbank_qa
+    description: Build Rockbank QA profile models.
+    definition:
+      union:
+        - method: tag
+          value: qa
+        - method: tag
+          value: rockbank

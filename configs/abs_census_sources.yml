@@ -1,0 +1,50 @@
+geography_level: sa2
+census_source_name: abs_census
+boundary_source_name: abs_boundaries
+census_database: postgres
+census_schema_var: census_data_schema
+census_schema_default: census_2021_data
+boundary_schema_var: census_boundary_schema
+boundary_schema_default: census_2021_bdys_gda94
+boundary_table: sa2_2021_aust_gda94
+
+metadata_tables:
+  - metadata_tables
+  - metadata_stats
+
+profile_tables:
+  - logical_table: G01
+    physical_tables: [sa2_g01]
+  - logical_table: G04
+    physical_tables: [sa2_g04a, sa2_g04b]
+  - logical_table: G05
+    physical_tables: [sa2_g05]
+  - logical_table: G07
+    physical_tables: [sa2_g07]
+  - logical_table: G08
+    physical_tables: [sa2_g08]
+  - logical_table: G09
+    physical_tables:
+      [sa2_g09a, sa2_g09b, sa2_g09c, sa2_g09d, sa2_g09e, sa2_g09f, sa2_g09g, sa2_g09h]
+  - logical_table: G13
+    physical_tables: [sa2_g13a, sa2_g13b, sa2_g13c, sa2_g13d, sa2_g13e]
+  - logical_table: G16
+    physical_tables: [sa2_g16a, sa2_g16b]
+  - logical_table: G17
+    physical_tables: [sa2_g17a, sa2_g17b, sa2_g17c]
+  - logical_table: G27
+    physical_tables: [sa2_g27a, sa2_g27b]
+  - logical_table: G29
+    physical_tables: [sa2_g29]
+  - logical_table: G36
+    physical_tables: [sa2_g36]
+  - logical_table: G37
+    physical_tables: [sa2_g37]
+  - logical_table: G46
+    physical_tables: [sa2_g46a, sa2_g46b]
+  - logical_table: G49
+    physical_tables: [sa2_g49a, sa2_g49b]
+  - logical_table: G50
+    physical_tables: [sa2_g50a, sa2_g50b, sa2_g50c]
+  - logical_table: G60
+    physical_tables: [sa2_g60a, sa2_g60b]

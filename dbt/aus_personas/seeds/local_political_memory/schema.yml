@@ -1,0 +1,59 @@
+version: 2
+
+seeds:
+  - name: willoughby_political_sources
+    description: >
+      Source registry for the Willoughby local political memory layer. Each row
+      records an authoritative source family that can be harvested into
+      election, meeting, notice-of-motion, or planning-determination facts.
+    config:
+      tags: ["local", "willoughby", "political_memory"]
+    columns:
+      - name: source_id
+        data_tests:
+          - not_null
+          - unique
+      - name: council_slug
+        data_tests:
+          - not_null
+      - name: source_family
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - election_results
+                  - meeting_votes
+                  - notices_of_motion
+                  - planning_determinations
+      - name: primary_url
+        data_tests:
+          - not_null
+      - name: authority
+        data_tests:
+          - not_null
+
+  - name: willoughby_political_event_contracts
+    description: >
+      Grain and key contracts for normalized Willoughby political memory facts.
+      These contracts keep sourced civic records separate from generated
+      persona prose.
+    config:
+      tags: ["local", "willoughby", "political_memory"]
+    columns:
+      - name: contract_id
+        data_tests:
+          - not_null
+          - unique
+      - name: event_family
+        data_tests:
+          - not_null
+      - name: one_row_represents
+        data_tests:
+          - not_null
+      - name: natural_key
+        data_tests:
+          - not_null
+      - name: required_fields
+        data_tests:
+          - not_null

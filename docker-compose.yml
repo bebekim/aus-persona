@@ -1,0 +1,23 @@
+services:
+  abs-persona-orchestrator:
+    build:
+      context: .
+    image: abs-persona-orchestrator:local
+    container_name: abs-persona-orchestrator
+    ports:
+      - "3000:3000"
+    environment:
+      DAGSTER_HOME: /app/dagster_home
+      AUS_PERSONAS_PGHOST: host.docker.internal
+      AUS_PERSONAS_PGPORT: "5433"
+      AUS_PERSONAS_PGUSER: ${AUS_PERSONAS_PGUSER:-dbt_user}
+      AUS_PERSONAS_PGPASSWORD: ${AUS_PERSONAS_PGPASSWORD:-dbt_password}
+      AUS_PERSONAS_PGDATABASE: ${AUS_PERSONAS_PGDATABASE:-postgres}
+      AUS_PERSONAS_DBT_SCHEMA: ${AUS_PERSONAS_DBT_SCHEMA:-aus_personas_dbt}
+    volumes:
+      - abs_persona_dagster_home:/app/dagster_home
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  abs_persona_dagster_home:

@@ -1,0 +1,17 @@
+dbt:
+  executable: dbt
+  project_dir: dbt/aus_personas
+  profiles_dir: dbt/aus_personas
+  jobs:
+    census_core:
+      description: Build the shared decoded Census foundations used by semantic topics.
+      command: run
+      selector: int_abs__column_dictionary int_abs__sa2_observations dim_sa2 fct_census_observation
+    g01_semantic:
+      description: Build interpreted G01 selected-person-characteristics semantic views.
+      command: run
+      selector: tag:g01
+    willoughby_local:
+      description: Build Willoughby City Council local hackathon marts.
+      command: run
+      selector: tag:willoughby

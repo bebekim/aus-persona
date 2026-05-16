@@ -1,0 +1,12 @@
+aus_personas:
+  target: local
+  outputs:
+    local:
+      type: postgres
+      host: "{{ env_var('AUS_PERSONAS_PGHOST', '127.0.0.1') }}"
+      port: "{{ env_var('AUS_PERSONAS_PGPORT', '5433') | int }}"
+      user: "{{ env_var('AUS_PERSONAS_PGUSER', 'dbt_user') }}"
+      password: "{{ env_var('AUS_PERSONAS_PGPASSWORD', 'dbt_password') }}"
+      dbname: "{{ env_var('AUS_PERSONAS_PGDATABASE', 'postgres') }}"
+      schema: "{{ env_var('AUS_PERSONAS_DBT_SCHEMA', 'aus_personas_dbt') }}"
+      threads: 4

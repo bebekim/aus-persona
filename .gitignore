@@ -1,0 +1,30 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.pytest_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv
+
+# Local secrets
+.env
+
+# Local agent/runtime artifacts
+.sandcastle/
+.DS_Store
+
+# dbt local artifacts
+dbt/**/target/
+dbt/**/logs/
+dbt/**/dbt_packages/
+dbt/**/profiles.yml
+
+# Dagster local runtime artifacts
+dagster_home/**
+!dagster_home/
+!dagster_home/dagster.yaml

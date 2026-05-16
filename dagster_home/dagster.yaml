@@ -1,0 +1,12 @@
+storage:
+  sqlite:
+    base_dir: ./dagster_home
+
+local_artifact_storage:
+  module: dagster._core.storage.root
+  class: LocalArtifactStorage
+  config:
+    base_dir: ./dagster_home/storage
+
+telemetry:
+  enabled: false

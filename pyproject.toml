@@ -1,0 +1,17 @@
+[project]
+name = "aus-personas"
+version = "0.1.0"
+description = "ABS-grounded synthetic Australian persona generation tooling"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "dagster>=1.13.4",
+    "data-designer>=0.5.9",
+    "dbt-postgres>=1.10.0",
+]
+
+[project.scripts]
+aus-personas = "aus_personas.cli:main"
+
+[tool.uv]
+package = true

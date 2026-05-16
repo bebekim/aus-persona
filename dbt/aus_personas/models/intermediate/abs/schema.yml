@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: int_abs__column_dictionary
+    columns:
+      - name: physical_table
+        data_tests:
+          - not_null
+      - name: raw_column
+        data_tests:
+          - not_null
+      - name: project_alias
+        data_tests:
+          - not_null
+      - name: source_profile
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["G", "P", "W", "I", "T"]
+      - name: sex
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["Male", "Female", "Persons"]
+
+  - name: int_abs__sa2_observations
+    columns:
+      - name: sa2_code
+        data_tests:
+          - not_null
+      - name: physical_table
+        data_tests:
+          - not_null
+      - name: raw_column
+        data_tests:
+          - not_null
+      - name: count
+        description: >
+          Raw ABS cell count. Nullable because some source profile cells are
+          blank or not applicable; downstream sampler models must decide
+          whether to exclude, impute, or coalesce these values.

@@ -1,0 +1,1 @@
+"""Synthetic-person sampler package."""

@@ -1,0 +1,72 @@
+version: 2
+
+sources:
+  - name: abs_census
+    database: postgres
+    schema: "{{ var('census_data_schema', 'census_2021_data') }}"
+    tables:
+      - name: metadata_tables
+        columns:
+          - name: table_number
+            data_tests:
+              - not_null
+              - unique
+      - name: metadata_stats
+        columns:
+          - name: sequential_id
+            data_tests:
+              - not_null
+              - unique
+      - name: sa2_g01
+      - name: sa2_g04a
+      - name: sa2_g04b
+      - name: sa2_g05
+      - name: sa2_g07
+      - name: sa2_g08
+      - name: sa2_g09a
+      - name: sa2_g09b
+      - name: sa2_g09c
+      - name: sa2_g09d
+      - name: sa2_g09e
+      - name: sa2_g09f
+      - name: sa2_g09g
+      - name: sa2_g09h
+      - name: sa2_g13a
+      - name: sa2_g13b
+      - name: sa2_g13c
+      - name: sa2_g13d
+      - name: sa2_g13e
+      - name: sa2_g16a
+      - name: sa2_g16b
+      - name: sa2_g17a
+      - name: sa2_g17b
+      - name: sa2_g17c
+      - name: sa2_g27a
+      - name: sa2_g27b
+      - name: sa2_g29
+      - name: sa2_g36
+      - name: sa2_g37
+      - name: sa2_g46a
+      - name: sa2_g46b
+      - name: sa2_g49a
+      - name: sa2_g49b
+      - name: sa2_g50a
+      - name: sa2_g50b
+      - name: sa2_g50c
+      - name: sa2_g60a
+      - name: sa2_g60b
+
+  - name: abs_boundaries
+    database: postgres
+    schema: "{{ var('census_boundary_schema', 'census_2021_bdys_gda94') }}"
+    tables:
+      - name: sa2_2021_aust_gda94
+        columns:
+          - name: sa2_code_2021
+            data_tests:
+              - not_null
+      - name: lga_2021_aust_gda94
+        columns:
+          - name: lga_code_2021
+            data_tests:
+              - not_null

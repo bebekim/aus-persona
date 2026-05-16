@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: dim_sa2
+    columns:
+      - name: sa2_code
+        data_tests:
+          - not_null
+          - unique
+      - name: sa2_name
+        data_tests:
+          - not_null
+      - name: state_name
+        data_tests:
+          - not_null
+
+  - name: fct_census_observation
+    columns:
+      - name: census_year
+        data_tests:
+          - not_null
+      - name: geography_level
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["sa2"]
+      - name: sa2_code
+        data_tests:
+          - not_null
+      - name: physical_table
+        data_tests:
+          - not_null
+      - name: raw_column
+        data_tests:
+          - not_null
+      - name: project_alias
+        data_tests:
+          - not_null
+      - name: count
+        description: >
+          Raw ABS cell count. Nullable because some source profile cells are
+          blank or not applicable; sampler-facing marts should explicitly
+          decide how to treat these cells.
