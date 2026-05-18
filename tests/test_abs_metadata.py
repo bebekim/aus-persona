@@ -74,6 +74,28 @@ def test_decodes_age_by_sex_without_category():
     assert decoded.category is None
 
 
+def test_decodes_g17_income_band_from_long_id_when_label_is_age():
+    decoded = decode_metadata_row(
+        MetadataRow(
+            sequential_id="G5857",
+            short_id="M_Neg_Nil_income_15_19_yrs",
+            long_id="MALES_Negative_Nil_income_Age_15_19_years",
+            table_number="G17A",
+            profile_table="G17a",
+            column_heading_description="Age: 15-19 years|MALES",
+            logical_table_name="Total Personal Income (Weekly) by Age by Sex",
+            population_universe="Persons aged 15 years and over",
+        )
+    )
+
+    assert decoded.logical_table_code == "G17"
+    assert decoded.physical_table == "sa2_g17a"
+    assert decoded.sex == "Male"
+    assert decoded.age_band == "15-19"
+    assert decoded.category_axis == "income_band"
+    assert decoded.category == "Negative Nil income"
+
+
 def test_decodes_labour_force_status_from_label():
     axes = parse_axes(
         "W01",

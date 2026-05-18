@@ -254,8 +254,17 @@ def parse_primary_category(
     if logical_code == "G04":
         return None
 
+    if logical_code == "G17":
+        match = re.search(
+            r"^(?:MALES|FEMALES|PERSONS)_(.*?)_Age_\d",
+            long_id,
+            re.IGNORECASE,
+        )
+        if match:
+            return clean_category(logical_code, match.group(1).replace("_", " "))
+
     label_head = source_label.split("|", maxsplit=1)[0].strip()
-    if label_head and not label_head.lower().startswith("age "):
+    if label_head and not label_head.lower().startswith("age"):
         return clean_category(logical_code, label_head)
 
     tokens = long_id.split("_")

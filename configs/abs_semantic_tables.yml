@@ -123,6 +123,7 @@ tables:
         grain: "sa2 x income_band x age_band x sex"
         feature_name: personal_income
         value_column: category
+        value_alias: income_band
         is_sampler_candidate: true
         total_policy: "exclude explicit totals and sex=Persons aggregate rows from sampling"
         sampler:

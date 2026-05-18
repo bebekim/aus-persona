@@ -162,6 +162,7 @@ def long_sql(
 
     limit_sql = "" if limit is None else f"\nlimit {limit}"
     value_expr = semantic_value_expression(section.value_column)
+    value_alias_sql = semantic_value_alias_sql(section, value_expr)
     return f"""
 select
   o.sa2_code,
@@ -174,6 +175,7 @@ select
   d.raw_column,
   {sql_quote(section.feature_name)} as feature_name,
   {value_expr} as feature_value,
+{value_alias_sql}
   d.sex,
   d.age_band,
   d.category_axis,
@@ -182,7 +184,9 @@ select
   d.is_total,
   {sql_quote(str(section.is_sampler_candidate).lower())}::boolean
     and not d.is_total
-    and coalesce(d.sex, '') <> 'Persons' as is_sampling_eligible,
+    and coalesce(d.sex, '') <> 'Persons'
+    and coalesce(d.category, '') not in ('Not stated', 'Not applicable')
+    as is_sampling_eligible,
   {sql_quote(section.total_policy)} as total_policy,
   d.source_label,
   d.short_id,
@@ -202,6 +206,12 @@ def semantic_value_expression(value_column: str) -> str:
     if value_column in {"sex", "age_band", "category"}:
         return f"d.{value_column}"
     return "d.category"
+
+
+def semantic_value_alias_sql(section: SemanticSection, value_expr: str) -> str:
+    if not section.value_alias:
+        return ""
+    return f"  {value_expr} as {section.value_alias},\n"
 
 
 def run_psql_csv(sql: str, *, container: str) -> list[dict[str, str]]:

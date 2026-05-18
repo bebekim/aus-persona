@@ -11,3 +11,5 @@ Repository changes worth human review should be summarized here.
   sections, including `aus-personas census worthy` inspection output.
 - Added all core persona seed `sa2_g*` Census topics to the dbt first-pass
   observation pipeline with coverage tests for table presence and row counts.
+- Added G17 personal-income semantic long-query support with explicit
+  `income_band` output and sampler exclusions for totals and missingness rows.

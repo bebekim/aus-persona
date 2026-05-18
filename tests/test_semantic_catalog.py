@@ -11,6 +11,20 @@ from aus_personas.census.semantic_catalog import (
 from aus_personas.census.semantic_queries import decode_column_sql, long_sql, profile_sql
 
 
+def test_dbt_category_cleaning_handles_g17_income_prefixes():
+    macro_sql = Path("dbt/aus_personas/macros/abs/parse_abs_axis_helpers.sql").read_text()
+    dictionary_sql = Path(
+        "dbt/aus_personas/models/intermediate/abs/int_abs__column_dictionary.sql"
+    ).read_text()
+
+    assert "G17" in macro_sql
+    assert "Income:" in macro_sql
+    assert "Personal income:" in macro_sql
+    assert "when s.logical_table_code = 'G17'" in dictionary_sql
+    assert "MALES|FEMALES|PERSONS" in dictionary_sql
+    assert "_Age_'), '_', ' ')" in dictionary_sql
+
+
 def test_loads_semantic_catalog():
     catalog = load_semantic_catalog(Path("configs/abs_semantic_tables.yml"))
 
@@ -168,6 +182,24 @@ def test_builds_long_sql_for_catalog_section():
     assert "is_sampling_eligible" in sql
     assert "coalesce(d.sex, '') <> 'Persons'" in sql
     assert "limit 10" in sql
+
+
+def test_builds_g17_long_sql_with_income_axes_and_sampling_exclusions():
+    catalog = load_semantic_catalog(Path("configs/abs_semantic_tables.yml"))
+    table = catalog.table("G17")
+    section = catalog.section("G17", "personal_income")
+
+    sql = long_sql(table, section, sa2_code="213041359", limit=10)
+
+    assert "'personal_income' as semantic_section" in sql
+    assert "'sa2_g17a'" in sql
+    assert "'sa2_g17b'" in sql
+    assert "'sa2_g17c'" in sql
+    assert "d.category as income_band" in sql
+    assert "d.age_band" in sql
+    assert "d.sex" in sql
+    assert "coalesce(d.sex, '') <> 'Persons'" in sql
+    assert "coalesce(d.category, '') not in ('Not stated', 'Not applicable')" in sql
 
 
 def test_builds_decode_column_sql_for_sa2_column():

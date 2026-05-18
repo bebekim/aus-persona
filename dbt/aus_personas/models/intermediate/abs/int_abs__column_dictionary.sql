@@ -27,12 +27,15 @@ joined as (
             when upper(s.source_label) like '%|PERSONS' or upper(s.long_id) ~ '(^|_)PERSONS($|_)' then 'Persons'
         end as sex,
         coalesce(
+            replace(substring(s.long_id from 'Age_([0-9]+_[0-9]+)_years'), '_', '-'),
             replace(substring(s.long_id from 'Age_years_([0-9]+_[0-9]+)_years'), '_', '-'),
             replace(substring(s.long_id from 'Age_groups_([0-9]+_[0-9]+)_years'), '_', '-'),
             replace(substring(s.long_id from '[A-Z]+_([0-9]+_[0-9]+)_years'), '_', '-'),
+            substring(s.long_id from 'Age_([0-9]+)_years_and_over') || '+',
             substring(s.long_id from 'Age_years_([0-9]+)_years_and_over') || '+',
             substring(s.long_id from 'Age_groups_([0-9]+)_years_and_over') || '+',
             substring(s.long_id from '[A-Z]+_([0-9]+)_years_and_over') || '+',
+            substring(s.long_id from 'Age_([0-9]+)($|_)'),
             substring(s.long_id from 'Age_years_([0-9]+)($|_)'),
             substring(s.long_id from '[A-Z]+_([0-9]+)_years($|_)')
         ) as age_band,
@@ -55,6 +58,7 @@ joined as (
         case
             when s.logical_table_code = 'G04' then null
             when s.logical_table_code = 'G09' then nullif(replace(substring(s.long_id from '^(?:MALES|FEMALES|PERSONS)_(.*?)_Age_'), '_', ' '), 'Total')
+            when s.logical_table_code = 'G17' then {{ clean_abs_category("nullif(replace(substring(s.long_id from '^(?:MALES|FEMALES|PERSONS)_(.*?)_Age_'), '_', ' '), 'Total')", "s.logical_table_code") }}
             else {{ clean_abs_category("split_part(s.source_label, '|', 1)", "s.logical_table_code") }}
         end as category,
         case

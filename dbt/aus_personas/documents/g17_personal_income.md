@@ -11,4 +11,8 @@ The intended modelling pattern is:
 3. create a PGM mart with one row per SA2, age band, sex, and income-band
    probability.
 
+The semantic long query exposes `income_band`, `age_band`, and `sex` explicitly.
+Totals, `Persons` sex aggregates, `Not stated`, and `Not applicable` values are
+available for inspection but excluded from sampler eligibility.
+
 {% enddocs %}
