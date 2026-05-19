@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+import yaml
 
 from aus_personas.census.semantic_catalog import (
     load_semantic_catalog,
@@ -9,6 +10,57 @@ from aus_personas.census.semantic_catalog import (
     validate_sa2_physical_table,
 )
 from aus_personas.census.semantic_queries import decode_column_sql, long_sql, profile_sql
+
+
+ACTIVE_PERSONA_TABLES = {
+    "G07",
+    "G08",
+    "G09",
+    "G13",
+    "G17",
+    "G22",
+    "G27",
+    "G35",
+    "G37",
+    "G46",
+    "G54",
+}
+
+
+def _physical_tables_by_logical_table(config_path: Path) -> dict[str, tuple[str, ...]]:
+    raw = yaml.safe_load(config_path.read_text())
+    return {
+        table["logical_table"]: tuple(table["physical_tables"])
+        for table in raw["profile_tables"]
+    }
+
+
+def test_abs_source_configs_agree_for_active_persona_topics():
+    source_tables = _physical_tables_by_logical_table(Path("configs/abs_census_sources.yml"))
+    dbt_sources = yaml.safe_load(
+        Path("dbt/aus_personas/models/sources/abs_sources.yml").read_text()
+    )
+    dbt_project = yaml.safe_load(Path("dbt/aus_personas/dbt_project.yml").read_text())
+
+    dbt_source_tables = {
+        table["name"]
+        for source in dbt_sources["sources"]
+        if source["name"] == "abs_census"
+        for table in source["tables"]
+        if table["name"].startswith("sa2_g")
+    }
+    dbt_project_tables = set(dbt_project["vars"]["first_pass_sa2_tables"])
+    active_physical_tables = {
+        physical_table
+        for logical_table in ACTIVE_PERSONA_TABLES
+        for physical_table in source_tables[logical_table]
+    }
+
+    assert set(source_tables) >= ACTIVE_PERSONA_TABLES
+    assert "G18" not in source_tables
+    assert "G40" not in source_tables
+    assert active_physical_tables <= dbt_source_tables
+    assert active_physical_tables <= dbt_project_tables
 
 
 def test_dbt_category_cleaning_handles_g17_income_prefixes():
@@ -36,6 +88,9 @@ def test_loads_semantic_catalog():
     g17 = catalog.table("G17")
     assert g17.default_physical_tables == ("sa2_g17a", "sa2_g17b", "sa2_g17c")
     assert g17.is_sa2_only
+
+    for logical_table in ACTIVE_PERSONA_TABLES:
+        assert catalog.table(logical_table).is_sa2_only
 
 
 def test_parses_raw_column_ranges():
@@ -160,6 +215,32 @@ def test_worthiness_rows_expose_purpose_decisions():
     ]
 
 
+@pytest.mark.parametrize(
+    ("logical_table", "section", "expected"),
+    [
+        ("G46", "labour_force_status", ("allow", "allow", "allow", "deny")),
+        ("G09", "country_of_birth", ("allow", "allow", "allow", "deny")),
+        ("G13", "language_home_english_proficiency", ("allow", "allow", "allow", "deny")),
+        ("G08", "ancestry", ("allow", "allow", "allow", "deny")),
+        ("G27", "household_relationship", ("allow", "allow", "allow", "deny")),
+        ("G37", "tenure_landlord", ("deny", "allow_context", "allow_validate", "deny")),
+        ("G54", "industry", ("deny", "allow_context", "allow_validate", "deny")),
+        ("G35", "household_composition", ("deny", "allow_context", "allow_validate", "deny")),
+        ("G22", "defence_service_status", ("deny", "allow_context", "allow_validate", "deny")),
+        ("G07", "indigenous_status", ("deny", "allow_context", "allow_validate", "deny")),
+    ],
+)
+def test_target_g_table_guardrails(logical_table, section, expected):
+    catalog = load_semantic_catalog(Path("configs/abs_semantic_tables.yml"))
+
+    decisions = tuple(
+        catalog.guardrail_decision(logical_table, section, purpose).decision
+        for purpose in ("sample", "condition", "validate", "generate")
+    )
+
+    assert decisions == expected
+
+
 def test_builds_profile_sql_for_catalog_table():
     catalog = load_semantic_catalog(Path("configs/abs_semantic_tables.yml"))
     sql = profile_sql(catalog.table("G01"))
@@ -200,6 +281,23 @@ def test_builds_g17_long_sql_with_income_axes_and_sampling_exclusions():
     assert "d.sex" in sql
     assert "coalesce(d.sex, '') <> 'Persons'" in sql
     assert "coalesce(d.category, '') not in ('Not stated', 'Not applicable')" in sql
+
+
+def test_builds_g13_long_sql_with_language_and_english_proficiency_axes():
+    catalog = load_semantic_catalog(Path("configs/abs_semantic_tables.yml"))
+    table = catalog.table("G13")
+    section = catalog.section("G13", "language_home_english_proficiency")
+
+    sql = long_sql(table, section, sa2_code="213041359", limit=10)
+
+    assert "'language_home_english_proficiency' as semantic_section" in sql
+    assert "d.category as language_used_at_home" in sql
+    assert "d.axes_json::jsonb ->> 'english_proficiency' as english_proficiency" in sql
+    assert "o.count is not null" in sql
+    assert (
+        "coalesce(d.axes_json::jsonb ->> 'english_proficiency', '') "
+        "not in ('Not stated', 'Not applicable')"
+    ) in sql
 
 
 def test_builds_decode_column_sql_for_sa2_column():

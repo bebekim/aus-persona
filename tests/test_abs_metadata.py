@@ -32,6 +32,117 @@ def test_decodes_country_of_birth_age_sex_column():
     }
 
 
+def test_decodes_ancestry_column():
+    decoded = decode_metadata_row(
+        MetadataRow(
+            sequential_id="G984",
+            short_id="Australian_Both_parents_born_Aust",
+            long_id="Australian_Both_parents_born_in_Australia",
+            table_number="G08",
+            profile_table="G08",
+            column_heading_description=(
+                "Ancestry: Australian|Both parents born in Australia"
+            ),
+            logical_table_name="Ancestry by Country of Birth of Parents",
+            population_universe="Persons",
+        )
+    )
+
+    assert decoded.logical_table_code == "G08"
+    assert decoded.project_alias == "ancestry_by_parent_birthplace"
+    assert decoded.category_axis == "ancestry"
+    assert decoded.category == "Australian"
+    assert json.loads(decoded.axes_json) == {
+        "ancestry": "Australian",
+    }
+
+
+def test_decodes_language_and_english_proficiency_axes():
+    decoded = decode_metadata_row(
+        MetadataRow(
+            sequential_id="G4586",
+            short_id="MSEO_UOLSE_VWorW",
+            long_id=(
+                "MALES_Speaks_English_only_"
+                "Uses_other_language_and_speaks_English_Very_well_or_well"
+            ),
+            table_number="G13A",
+            profile_table="G13a",
+            column_heading_description=(
+                "Uses other language and speaks English: Very well or well|MALES"
+            ),
+            logical_table_name=(
+                "Language Used at Home by Proficiency in Spoken English by Sex"
+            ),
+            population_universe="Persons",
+        )
+    )
+
+    assert decoded.logical_table_code == "G13"
+    assert decoded.category_axis == "language_used_at_home"
+    assert decoded.category == "Speaks English only"
+    assert json.loads(decoded.axes_json) == {
+        "english_proficiency": "Very well or well",
+        "language_used_at_home": "Speaks English only",
+        "sex": "Male",
+    }
+
+
+def test_decodes_defence_service_status_column():
+    decoded = decode_metadata_row(
+        MetadataRow(
+            sequential_id="G6901",
+            short_id="M_25_34_Has_served",
+            long_id="MALES_25_34_years_Has_served_in_the_Australian_Defence_Force",
+            table_number="G22",
+            profile_table="G22",
+            column_heading_description=(
+                "Has served in the Australian Defence Force|MALES"
+            ),
+            logical_table_name="Australian Defence Force Service by Age by Sex",
+            population_universe="Persons aged 15 years and over",
+        )
+    )
+
+    assert decoded.category_axis == "defence_service_status"
+    assert decoded.category == "Has served in the Australian Defence Force"
+    assert json.loads(decoded.axes_json) == {
+        "age_band": "25-34",
+        "defence_service_status": "Has served in the Australian Defence Force",
+        "sex": "Male",
+    }
+
+
+def test_decodes_household_composition_and_size_axes():
+    decoded = decode_metadata_row(
+        MetadataRow(
+            sequential_id="G9201",
+            short_id="Couple_children_4_persons",
+            long_id=(
+                "One_family_household_Couple_family_with_children_"
+                "Four_persons_usually_resident"
+            ),
+            table_number="G35",
+            profile_table="G35",
+            column_heading_description=(
+                "One family household: Couple family with children|"
+                "Four persons usually resident"
+            ),
+            logical_table_name=(
+                "Household Composition by Number of Persons Usually Resident"
+            ),
+            population_universe="Occupied private dwellings",
+        )
+    )
+
+    assert decoded.category_axis == "household_composition"
+    assert decoded.category == "One family household: Couple family with children"
+    assert json.loads(decoded.axes_json) == {
+        "household_composition": "One family household: Couple family with children",
+        "household_size": "Four persons usually resident",
+    }
+
+
 def test_decodes_marital_status_column():
     decoded = decode_metadata_row(
         MetadataRow(
@@ -148,3 +259,23 @@ def test_strips_redundant_occupation_prefix():
     assert decoded.sex == "Persons"
     assert decoded.category_axis == "occupation"
     assert decoded.category == "Managers"
+
+
+def test_strips_redundant_industry_prefix():
+    decoded = decode_metadata_row(
+        MetadataRow(
+            sequential_id="G15301",
+            short_id="M_25_34_Health_care",
+            long_id=(
+                "MALES_Health_Care_and_Social_Assistance_Age_25_34_years"
+            ),
+            table_number="G54A",
+            profile_table="G54a",
+            column_heading_description="Age: 25-34 years|MALES",
+            logical_table_name="Industry of Employment by Age by Sex",
+            population_universe="Employed persons aged 15 years and over",
+        )
+    )
+
+    assert decoded.category_axis == "industry"
+    assert decoded.category == "Health Care and Social Assistance"

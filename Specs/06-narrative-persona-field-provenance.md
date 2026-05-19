@@ -116,6 +116,8 @@ Recommended first-pass map:
 | `marital_status` | `sampled_from_abs` | `G05`. |
 | `family_type` | `conditioned_from_abs` | `G29`, with household/family grain caveat. |
 | `household_relationship` | `sampled_from_abs` | `G27`. |
+| `household_size` | `conditioned_from_abs` | `G35`; household-grain context, not a direct individual attribute. |
+| `household_composition` | `conditioned_from_abs` | `G35`; household-grain context for plausibility and validation. |
 | `housing_type` | `sampled_from_abs` | `G36`. |
 | `tenure_landlord` | `conditioned_from_abs` | `G37`. |
 | `education_level` | `sampled_from_abs` | `G16` and `G49`. |
@@ -130,6 +132,8 @@ Recommended first-pass map:
 | `english_proficiency` | `sampled_from_abs` | `G13`. |
 | `indigenous_status` | `sampled_from_abs` | `G07`, with privacy/small-count restrictions. |
 | `defence_service_status` | `conditioned_from_abs` | `G22`; not equivalent to Korean military status. |
+| `rent_band` | `conditioned_from_abs` | Deferred `G40`; use only after rented-household context is sampled. |
+| `accessibility_support_context` | `conditioned_from_abs` | Deferred `G18`; use only for reviewed support/accessibility use cases. |
 | narrative persona fields | `generated_constrained` | Data Designer/LLM output constrained by the fixed seed. |
 
 ## Validator Requirements

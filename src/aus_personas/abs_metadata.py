@@ -59,12 +59,15 @@ CATEGORY_AXIS_BY_TABLE = {
     "G05": "registered_marital_status",
     "G06": "social_marital_status",
     "G07": "indigenous_status",
+    "G08": "ancestry",
     "G13": "language_home",
     "G14": "religious_affiliation",
     "G16": "school_completion",
     "G17": "income_band",
     "G18": "core_activity_need_for_assistance",
+    "G22": "defence_service_status",
     "G27": "household_relationship",
+    "G35": "household_composition",
     "G36": "dwelling_structure",
     "G37": "tenure_landlord_type",
     "G46": "labour_force_status",
@@ -83,17 +86,21 @@ FIRST_PASS_LOGICAL_TABLES = (
     "G04",
     "G05",
     "G07",
+    "G08",
     "G09",
     "G13",
     "G16",
     "G17",
+    "G22",
     "G27",
     "G29",
+    "G35",
     "G36",
     "G37",
     "G46",
     "G49",
     "G50",
+    "G54",
     "G60",
 )
 
@@ -170,9 +177,10 @@ def parse_axes(
     source_label: str,
 ) -> dict[str, str]:
     axes: dict[str, str] = {}
-    sex = parse_sex(long_id, source_label)
-    if sex:
-        axes["sex"] = sex
+    if logical_code not in {"G08", "G35", "G37"}:
+        sex = parse_sex(long_id, source_label)
+        if sex:
+            axes["sex"] = sex
 
     age_band = parse_age_band(long_id, source_label)
     if age_band:
@@ -180,8 +188,20 @@ def parse_axes(
 
     category = parse_primary_category(logical_code, long_id, source_label)
     axis_name = CATEGORY_AXIS_BY_TABLE.get(logical_code)
+    if logical_code == "G13":
+        axis_name = "language_used_at_home"
     if axis_name and category:
         axes[axis_name] = category
+
+    if logical_code == "G13":
+        english_proficiency = parse_english_proficiency(source_label, long_id)
+        if english_proficiency:
+            axes["english_proficiency"] = english_proficiency
+
+    if logical_code == "G35":
+        household_size = parse_household_size(source_label, long_id)
+        if household_size:
+            axes["household_size"] = household_size
 
     if logical_code == "G09":
         country = parse_country_of_birth(long_id)
@@ -263,6 +283,20 @@ def parse_primary_category(
         if match:
             return clean_category(logical_code, match.group(1).replace("_", " "))
 
+    if logical_code == "G13":
+        language = parse_g13_language(long_id)
+        if language:
+            return clean_category(logical_code, language)
+
+    if logical_code == "G54":
+        match = re.search(
+            r"^(?:MALES|FEMALES|PERSONS)_(.*?)_Age_\d",
+            long_id,
+            re.IGNORECASE,
+        )
+        if match:
+            return clean_category(logical_code, match.group(1).replace("_", " "))
+
     label_head = source_label.split("|", maxsplit=1)[0].strip()
     if label_head and not label_head.lower().startswith("age"):
         return clean_category(logical_code, label_head)
@@ -287,6 +321,7 @@ def clean_category(logical_code: str, value: str) -> str:
         "G14": ("Religion:", "Religious affiliation:"),
         "G16": ("Highest year of school completed:",),
         "G17": ("Income:", "Personal income:"),
+        "G08": ("Ancestry:",),
         "G36": ("Dwelling structure:",),
         "G37": ("Tenure type:", "Landlord type:"),
         "G49": ("Qualification:", "Level of education:"),
@@ -300,6 +335,85 @@ def clean_category(logical_code: str, value: str) -> str:
         if cleaned.lower().startswith(prefix.lower()):
             return cleaned[len(prefix) :].strip()
     return cleaned
+
+
+def parse_english_proficiency(source_label: str, long_id: str) -> str | None:
+    parts = [
+        part.strip()
+        for part in source_label.split("|")
+        if part.strip() and part.strip().upper() not in {"MALES", "FEMALES", "PERSONS"}
+    ]
+    if len(parts) >= 2:
+        value = parts[1]
+        return None if value.lower() == "total" else value
+    value = parse_g13_english_proficiency(long_id)
+    if value is None:
+        return None
+    return None if value.lower() == "total" else value
+
+
+G13_PROFICIENCY_PATTERNS = (
+    "Speaks_English_only",
+    "Uses_other_language_and_speaks_English_Very_well_or_well",
+    "Uses_other_language_and_speaks_English_Not_well_or_not_at_all",
+    "Uses_other_language_and_speaks_English_Total",
+    "Not_stated",
+    "Total",
+)
+
+
+def parse_g13_language(long_id: str) -> str | None:
+    match = parse_g13_long_id(long_id)
+    if not match:
+        return None
+    value = match[0].replace("_", " ")
+    return None if value.lower() == "total" else value
+
+
+def parse_g13_english_proficiency(long_id: str) -> str | None:
+    match = parse_g13_long_id(long_id)
+    if not match:
+        return None
+    value = clean_g13_proficiency(match[1])
+    return None if value.lower() == "total" else value
+
+
+def parse_g13_long_id(long_id: str) -> tuple[str, str] | None:
+    pattern = "|".join(re.escape(value) for value in G13_PROFICIENCY_PATTERNS)
+    match = re.match(
+        rf"^(?:MALES|FEMALES|PERSONS)_(.*?)_({pattern})$",
+        long_id,
+        re.IGNORECASE,
+    )
+    if not match:
+        return None
+    return match.group(1), match.group(2)
+
+
+def clean_g13_proficiency(value: str) -> str:
+    cleaned = value.replace("_", " ")
+    cleaned = cleaned.replace("Uses other language and speaks English ", "")
+    return cleaned.replace("English Very", "English: Very").replace(
+        "English Not",
+        "English: Not",
+    )
+
+
+def parse_household_size(source_label: str, long_id: str) -> str | None:
+    parts = [part.strip() for part in source_label.split("|") if part.strip()]
+    if len(parts) >= 2:
+        value = parts[1]
+        return None if value.lower() == "total" else value
+
+    match = re.search(
+        r"((?:One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten|[0-9]+)_"
+        r"persons?_usually_resident)",
+        long_id,
+        re.IGNORECASE,
+    )
+    if not match:
+        return None
+    return match.group(1).replace("_", " ")
 
 
 def strip_age_tokens(tokens: list[str]) -> list[str]:

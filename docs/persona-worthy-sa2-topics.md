@@ -105,16 +105,21 @@ Useful Australian additions beyond the Korea schema:
   other geographic context when available.
 - `income_band` from `G17`.
 - `labour_force_status` from `G46`.
-- `industry` from `G54`.
+- `industry` from `G54`; this is employed-person context and should be
+  conditioned by labour-force and occupation logic before it influences prose.
 - `ancestry` from `G08`.
 - `country_of_birth` from `G09`.
 - `language_used_at_home` and `english_proficiency` from `G13`.
 - `indigenous_status` from `G07`, with privacy and small-count care.
-- `tenure_landlord`, rent band, or owner/renter context from `G37` and `G40`
-  after household/dwelling context is sampled.
+- `tenure_landlord` or owner/renter context from `G37` after
+  household/dwelling context is sampled.
+- Deferred `rent_band` context from `G40` only after a rented-household use case
+  is explicitly promoted.
 - `household_size` and composition context from `G35`.
-- Optional support/accessibility context from `G18` only for clearly scoped,
+- Deferred support/accessibility context from `G18` only for clearly scoped,
   reviewed use cases.
+- `defence_service_status` from `G22`; this is Australian Defence Force
+  service context, not a direct migration of Korean military status.
 
 ## Worthiness Tiers
 

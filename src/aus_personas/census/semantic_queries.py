@@ -163,6 +163,7 @@ def long_sql(
     limit_sql = "" if limit is None else f"\nlimit {limit}"
     value_expr = semantic_value_expression(section.value_column)
     value_alias_sql = semantic_value_alias_sql(section, value_expr)
+    sampling_eligibility_sql = sampling_eligibility_expression(section)
     return f"""
 select
   o.sa2_code,
@@ -182,11 +183,7 @@ select
   d.category,
   o.count,
   d.is_total,
-  {sql_quote(str(section.is_sampler_candidate).lower())}::boolean
-    and not d.is_total
-    and coalesce(d.sex, '') <> 'Persons'
-    and coalesce(d.category, '') not in ('Not stated', 'Not applicable')
-    as is_sampling_eligible,
+  {sampling_eligibility_sql} as is_sampling_eligible,
   {sql_quote(section.total_policy)} as total_policy,
   d.source_label,
   d.short_id,
@@ -205,13 +202,34 @@ order by o.sa2_code, d.physical_table, substring(d.raw_column from 2)::integer{l
 def semantic_value_expression(value_column: str) -> str:
     if value_column in {"sex", "age_band", "category"}:
         return f"d.{value_column}"
+    if value_column in {"english_proficiency", "household_size"}:
+        return f"d.axes_json::jsonb ->> {sql_quote(value_column)}"
     return "d.category"
 
 
 def semantic_value_alias_sql(section: SemanticSection, value_expr: str) -> str:
-    if not section.value_alias:
-        return ""
-    return f"  {value_expr} as {section.value_alias},\n"
+    aliases: list[str] = []
+    if section.value_alias:
+        aliases.append(f"  {value_expr} as {section.value_alias},")
+    for alias in section.extra_value_aliases:
+        aliases.append(f"  {semantic_value_expression(alias)} as {alias},")
+    return "\n".join(aliases) + ("\n" if aliases else "")
+
+
+def sampling_eligibility_expression(section: SemanticSection) -> str:
+    conditions = [
+        f"{sql_quote(str(section.is_sampler_candidate).lower())}::boolean",
+        "not d.is_total",
+        "o.count is not null",
+        "coalesce(d.sex, '') <> 'Persons'",
+        "coalesce(d.category, '') not in ('Not stated', 'Not applicable')",
+    ]
+    for alias in section.extra_value_aliases:
+        alias_expr = semantic_value_expression(alias)
+        conditions.append(
+            f"coalesce({alias_expr}, '') not in ('Not stated', 'Not applicable')"
+        )
+    return "\n    and ".join(conditions)
 
 
 def run_psql_csv(sql: str, *, container: str) -> list[dict[str, str]]:

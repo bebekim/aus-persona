@@ -43,11 +43,14 @@ joined as (
             when s.logical_table_code = 'G05' then 'registered_marital_status'
             when s.logical_table_code = 'G06' then 'social_marital_status'
             when s.logical_table_code = 'G07' then 'indigenous_status'
+            when s.logical_table_code = 'G08' then 'ancestry'
             when s.logical_table_code = 'G09' then 'country_of_birth'
-            when s.logical_table_code = 'G13' then 'language_home'
+            when s.logical_table_code = 'G13' then 'language_used_at_home'
             when s.logical_table_code = 'G16' then 'school_completion'
             when s.logical_table_code = 'G17' then 'income_band'
+            when s.logical_table_code = 'G22' then 'defence_service_status'
             when s.logical_table_code = 'G27' then 'household_relationship'
+            when s.logical_table_code = 'G35' then 'household_composition'
             when s.logical_table_code = 'G36' then 'dwelling_structure'
             when s.logical_table_code = 'G37' then 'tenure_landlord_type'
             when s.logical_table_code = 'G46' then 'labour_force_status'
@@ -58,9 +61,42 @@ joined as (
         case
             when s.logical_table_code = 'G04' then null
             when s.logical_table_code = 'G09' then nullif(replace(substring(s.long_id from '^(?:MALES|FEMALES|PERSONS)_(.*?)_Age_'), '_', ' '), 'Total')
+            when s.logical_table_code = 'G13' then {{ clean_abs_category("nullif(replace((regexp_match(s.long_id, '^(?:MALES|FEMALES|PERSONS)_(.*?)_(Speaks_English_only|Uses_other_language_and_speaks_English_Very_well_or_well|Uses_other_language_and_speaks_English_Not_well_or_not_at_all|Uses_other_language_and_speaks_English_Total|Not_stated|Total)$'))[1], '_', ' '), 'Total')", "s.logical_table_code") }}
             when s.logical_table_code = 'G17' then {{ clean_abs_category("nullif(replace(substring(s.long_id from '^(?:MALES|FEMALES|PERSONS)_(.*?)_Age_'), '_', ' '), 'Total')", "s.logical_table_code") }}
+            when s.logical_table_code = 'G54' then {{ clean_abs_category("nullif(replace(substring(s.long_id from '^(?:MALES|FEMALES|PERSONS)_(.*?)_Age_'), '_', ' '), 'Total')", "s.logical_table_code") }}
             else {{ clean_abs_category("split_part(s.source_label, '|', 1)", "s.logical_table_code") }}
         end as category,
+        case
+            when s.logical_table_code = 'G13'
+                then coalesce(
+                    nullif(
+                        btrim(
+                            regexp_replace(
+                                replace(
+                                    (regexp_match(s.long_id, '^(?:MALES|FEMALES|PERSONS)_(.*?)_(Speaks_English_only|Uses_other_language_and_speaks_English_Very_well_or_well|Uses_other_language_and_speaks_English_Not_well_or_not_at_all|Uses_other_language_and_speaks_English_Total|Not_stated|Total)$'))[2],
+                                    '_',
+                                    ' '
+                                ),
+                                '^Uses other language and speaks English\s*',
+                                '',
+                                'i'
+                            )
+                        ),
+                        'Total'
+                    ),
+                    case
+                    when upper(nullif(split_part(s.source_label, '|', 2), '')) in ('MALES', 'FEMALES', 'PERSONS') then null
+                    else nullif(split_part(s.source_label, '|', 2), '')
+                    end
+                )
+        end as english_proficiency,
+        case
+            when s.logical_table_code = 'G35'
+                then nullif(
+                    split_part(s.source_label, '|', 2),
+                    ''
+                )
+        end as household_size,
         case
             when s.long_id ~* '(^|_)Total($|_)' then true
             when s.source_label ~* '(^|\|)Total($|\|)' then true
@@ -83,5 +119,9 @@ select
                 then jsonb_build_object(category_axis, category)
             else '{}'::jsonb
         end
+        || jsonb_build_object(
+            'english_proficiency', english_proficiency,
+            'household_size', household_size
+        )
     )::text as axes_json
 from joined

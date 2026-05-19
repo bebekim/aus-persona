@@ -13,3 +13,6 @@ Repository changes worth human review should be summarized here.
   observation pipeline with coverage tests for table presence and row counts.
 - Added G17 personal-income semantic long-query support with explicit
   `income_band` output and sampler exclusions for totals and missingness rows.
+- Promoted the remaining ABS persona G-table coverage contract for labour
+  force, ancestry, country of birth, language/proficiency, household,
+  tenure, industry, defence-service, and guarded Indigenous-status context.

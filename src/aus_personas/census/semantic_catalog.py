@@ -49,6 +49,7 @@ class SemanticSection:
     feature_name: str
     value_column: str
     value_alias: str
+    extra_value_aliases: tuple[str, ...]
     is_sampler_candidate: bool
     total_policy: str
     sampler_tier: str
@@ -286,6 +287,7 @@ def parse_semantic_table(logical_table: str, raw_table: dict[str, Any]) -> Seman
             feature_name=section_config["feature_name"],
             value_column=section_config["value_column"],
             value_alias=section_config.get("value_alias", ""),
+            extra_value_aliases=tuple(section_config.get("extra_value_aliases", ())),
             is_sampler_candidate=section_config.get("is_sampler_candidate", False),
             total_policy=section_config.get(
                 "total_policy",

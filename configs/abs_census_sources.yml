@@ -32,10 +32,14 @@ profile_tables:
     physical_tables: [sa2_g16a, sa2_g16b]
   - logical_table: G17
     physical_tables: [sa2_g17a, sa2_g17b, sa2_g17c]
+  - logical_table: G22
+    physical_tables: [sa2_g22]
   - logical_table: G27
     physical_tables: [sa2_g27a, sa2_g27b]
   - logical_table: G29
     physical_tables: [sa2_g29]
+  - logical_table: G35
+    physical_tables: [sa2_g35]
   - logical_table: G36
     physical_tables: [sa2_g36]
   - logical_table: G37
@@ -46,5 +50,7 @@ profile_tables:
     physical_tables: [sa2_g49a, sa2_g49b]
   - logical_table: G50
     physical_tables: [sa2_g50a, sa2_g50b, sa2_g50c]
+  - logical_table: G54
+    physical_tables: [sa2_g54a, sa2_g54b, sa2_g54c, sa2_g54d]
   - logical_table: G60
     physical_tables: [sa2_g60a, sa2_g60b]
