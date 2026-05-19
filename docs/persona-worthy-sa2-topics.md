@@ -58,6 +58,64 @@ Narrative fields should be generated from the structured seed and local context:
 ABS Census data should constrain the seed. It should not be expected to contain
 ready-made hobbies, tastes, skills, or prose.
 
+## Korea Persona Schema Mapping
+
+The NVIDIA Nemotron Personas Korea schema is useful as an output-shape
+reference, not as an Australian population base.
+
+Map Korea-style structured columns into Australian Census-backed seed fields
+before generating prose:
+
+| Korea column | Australian persona field | ABS/Census source |
+| --- | --- | --- |
+| `uuid` | `uuid` | Generated identifier. |
+| `sex` | `sex` | `G04` age by sex. |
+| `age` | `age`, `age_band` | `G04` age by sex; exact age is sampled inside the ABS age band. |
+| `marital_status` | `marital_status` | `G05` registered marital status; optionally use `G06` social marital status for partner/living arrangement context. |
+| `military_status` | `defence_service_status` | `G22` Australian Defence Force service; not equivalent to Korean military-service status. |
+| `family_type` | `family_type`, `household_relationship` | `G29` family composition and `G27` relationship in household; grain mismatch must be declared. |
+| `housing_type` | `housing_type` | `G36` dwelling structure. |
+| `education_level` | `education_level`, `school_completion` | `G16` school completion and `G49` non-school qualification level. |
+| `bachelors_field` | `field_of_study` | `G50` field of study; broader than bachelor-only. |
+| `occupation` | `occupation` | `G60` occupation by age and sex; condition on labour force status where possible. |
+| `district` | `sa2_name` or `lga_name` | ABS geography dimension; choose the local reporting grain explicitly. |
+| `province` | `state` | ABS geography dimension. |
+| `country` | `country` | Constant/reference value, usually `Australia`. |
+
+Generate Korea-style narrative columns from the fixed Australian seed instead
+of reading them from ABS:
+
+- `professional_persona`
+- `sports_persona`
+- `arts_persona`
+- `travel_persona`
+- `culinary_persona`
+- `family_persona`
+- `persona`
+- `cultural_background`
+- `skills_and_expertise`
+- `skills_and_expertise_list`
+- `hobbies_and_interests`
+- `hobbies_and_interests_list`
+- `career_goals_and_ambitions`
+
+Useful Australian additions beyond the Korea schema:
+
+- `sa2_code`, `sa2_name`, `state`, `lga_name`, `gccsa_name`, and remoteness or
+  other geographic context when available.
+- `income_band` from `G17`.
+- `labour_force_status` from `G46`.
+- `industry` from `G54`.
+- `ancestry` from `G08`.
+- `country_of_birth` from `G09`.
+- `language_used_at_home` and `english_proficiency` from `G13`.
+- `indigenous_status` from `G07`, with privacy and small-count care.
+- `tenure_landlord`, rent band, or owner/renter context from `G37` and `G40`
+  after household/dwelling context is sampled.
+- `household_size` and composition context from `G35`.
+- Optional support/accessibility context from `G18` only for clearly scoped,
+  reviewed use cases.
+
 ## Worthiness Tiers
 
 Use these tiers before promoting any raw column into a semantic model.
@@ -162,4 +220,3 @@ A topic is ready for sampler use only when:
 - the topic can be queried for a single SA2 by readable category names;
 - QA checks prove that semantic counts reconcile to source totals within known
   ABS perturbation limits.
-
