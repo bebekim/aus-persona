@@ -16,3 +16,5 @@ Repository changes worth human review should be summarized here.
 - Promoted the remaining ABS persona G-table coverage contract for labour
   force, ancestry, country of birth, language/proficiency, household,
   tenure, industry, defence-service, and guarded Indigenous-status context.
+- Defined the promotion gate from semantic Census topic to materialized PGM mart,
+  including non-promotion criteria and required mart tests.

@@ -385,6 +385,18 @@ A semantic topic may be promoted to a dbt PGM mart only when:
 
 Otherwise it stays queryable through the semantic CLI only.
 
+Detailed promotion rules live in `Specs/02-pgm-feature-marts.md`. The short
+version is:
+
+- `candidate` or `semantic_ready` means the topic can be inspected through the
+  semantic CLI.
+- `mart_ready` means a materialized PGM mart exists, has explicit denominator
+  and missingness policy, and passes mart tests.
+- A topic with `guardrail.sample: deny` cannot become a sampler-facing PGM mart,
+  even if it remains useful as validation or conditioning context.
+- A topic with `guardrail.sample: allow` still stays CLI/query-only until the
+  sampler dependency graph needs it.
+
 ## Preflight Risks
 
 This spec is not ready for implementation if any of these are unresolved:

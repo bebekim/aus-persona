@@ -63,7 +63,10 @@ Create models under:
 dbt/aus_personas/models/marts/pgm/
 ```
 
-Minimum marts:
+The original broad list below is a backlog, not an automatic build list. A mart
+is in scope only after it passes the promotion gate in this spec.
+
+Backlog marts:
 
 ```text
 mart_pgm__sa2_age_sex
@@ -83,6 +86,73 @@ mart_pgm__sa2_occupation
 ```
 
 Each mart should expose one distribution family, not a generic catch-all table.
+
+## Promotion Gate
+
+Semantic topic promotion is a modeling decision, not a naming convention. A
+topic should remain CLI/query-only when it is useful for inspection, validation,
+or local context but is not yet needed as a sampled conditional distribution.
+
+Promote a semantic topic to a materialized PGM mart only when all of these are
+true:
+
+- The topic has an active `configs/abs_semantic_tables.yml` entry with
+  `promotion_status` at least `semantic_ready`.
+- The semantic long output exposes stable axes, readable categories, source
+  provenance, `is_total`, and explicit sampler eligibility.
+- The topic has `guardrail.sample: allow`; context-only or guarded topics are
+  not sampler-facing marts.
+- The sampler dependency graph has a concrete edge that consumes the topic.
+- The mart can state its grain as one distribution family, for example
+  `SA2 x age_band x sex -> income_band`.
+- The mart can define its denominator from non-null, non-total, eligible rows
+  without mixing incompatible universes.
+- Missing, `Not stated`, `Not applicable`, total, child-only, and sparse
+  categories have documented handling before probabilities are exposed.
+- The topic has at least one reproducible inspection query for a known SA2.
+- dbt tests can prove uniqueness, not-null keys, probability range, total
+  exclusion, SA2 relationships, and source row lineage.
+
+Do not promote a topic when any of these apply:
+
+- It exists only because the ABS source table is available.
+- It is a validation rollup that duplicates a more detailed topic.
+- It is sensitive or guarded and only allowed for context or validation, such
+  as Indigenous-status context before a reviewed use case.
+- It requires external or generated enrichment to define the sampled value.
+- It is useful prose context, but not a feature the sampler should draw.
+- It mixes resident population, household, dwelling, family, or working
+  population universes without a clear denominator.
+- Its categories need collapse or suppression rules that have not been reviewed.
+
+Promotion status meanings:
+
+```text
+candidate       useful topic identified; no sampler contract yet
+semantic_ready  long semantic query exists and reconciles enough for inspection
+mart_ready      PGM mart exists and passes this spec's tests
+sampler_ready   sampler consumes the mart with validation evidence
+context         useful as conditioning or local context, not sampled
+guarded         sensitive; explicit reviewed use case required before sampling
+deferred        useful later, intentionally not active yet
+excluded        intentionally out of scope
+```
+
+## Examples
+
+`G01` age/sex is a useful first semantic inspection source, but it should not be
+promoted wholesale. Only the age/sex section can justify a mart, and even that
+mart is provisional because G04 gives a cleaner dedicated age-by-sex table. G01
+birthplace, language, and other broad summaries remain validation/context rows;
+they should not become sampled `country_of_birth` or `language_used_at_home`
+marts when detailed G09 and G13 topics exist.
+
+`G17` personal income is the reference promotion pattern. It has a direct
+persona field (`income_band`), concrete conditioning axes (`SA2 x age_band x
+sex`), explicit total and missingness exclusions, semantic parser tests, and a
+sampler dependency edge after age/sex. It can be promoted to
+`mart_pgm__sa2_personal_income` once the mart exposes probability mass over
+eligible income bands and passes the mart test suite.
 
 ## Standard Mart Shape
 
@@ -222,7 +292,13 @@ Each feature mart must have:
 - accepted value test for `geography_level = sa2`
 - relationship test from `sa2_code` to `dim_sa2.sa2_code`
 - a singular test that no sampler-facing rows have `is_total = true`
+- a singular test that no sampler-facing rows have null counts
+- a singular test that no sampler-facing rows have non-eligible semantic rows
+- a singular test that each mart grain is unique
 - a singular test that `probability_within_sa2` is between 0 and 1
+- a singular test that probabilities sum to approximately 1 per denominator
+  partition
+- a singular test that source lineage columns are populated
 
 Add at least one row-count sanity test for:
 
