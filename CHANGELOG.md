@@ -20,3 +20,5 @@ Repository changes worth human review should be summarized here.
   including non-promotion criteria and required mart tests.
 - Added a smaller first-tranche PGM mart spec scoped to age/sex, personal
   income, and labour-force status.
+- Implemented first sampler-facing PGM marts for SA2 age/sex and personal
+  income with probability, eligibility, lineage, and Rockbank smoke tests.

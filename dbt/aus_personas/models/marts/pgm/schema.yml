@@ -1,0 +1,127 @@
+version: 2
+
+models:
+  - name: mart_pgm__sa2_age_sex
+    description: >
+      Sampler-facing joint age and sex distribution by SA2 from provisional G01
+      selected-person-characteristics semantic output.
+    columns:
+      - name: census_year
+        data_tests:
+          - not_null
+      - name: geography_level
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["sa2"]
+      - name: sa2_code
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_sa2')
+                field: sa2_code
+      - name: feature_name
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["age_sex"]
+      - name: feature_value
+        data_tests:
+          - not_null
+      - name: age_band
+        data_tests:
+          - not_null
+      - name: sex
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["Male", "Female"]
+      - name: count
+        data_tests:
+          - not_null
+      - name: denominator_count
+        data_tests:
+          - not_null
+      - name: probability_within_partition
+        data_tests:
+          - not_null
+      - name: source_logical_table
+        data_tests:
+          - not_null
+      - name: source_physical_table
+        data_tests:
+          - not_null
+      - name: source_raw_column
+        data_tests:
+          - not_null
+      - name: source_label
+        data_tests:
+          - not_null
+
+  - name: mart_pgm__sa2_personal_income
+    description: >
+      Sampler-facing personal weekly income distribution by SA2, age band, and
+      sex from G17.
+    columns:
+      - name: census_year
+        data_tests:
+          - not_null
+      - name: geography_level
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["sa2"]
+      - name: sa2_code
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_sa2')
+                field: sa2_code
+      - name: feature_name
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["personal_income"]
+      - name: feature_value
+        data_tests:
+          - not_null
+      - name: age_band
+        data_tests:
+          - not_null
+      - name: sex
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["Male", "Female"]
+      - name: income_band
+        data_tests:
+          - not_null
+      - name: count
+        data_tests:
+          - not_null
+      - name: denominator_count
+        data_tests:
+          - not_null
+      - name: probability_within_partition
+        data_tests:
+          - not_null
+      - name: source_logical_table
+        data_tests:
+          - not_null
+      - name: source_physical_table
+        data_tests:
+          - not_null
+      - name: source_raw_column
+        data_tests:
+          - not_null
+      - name: source_label
+        data_tests:
+          - not_null
