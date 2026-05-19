@@ -8,6 +8,7 @@ Specs are the source of truth for Night Shift work.
 - [Spec 04: First PGM Feature Marts](02-pgm-feature-marts.md)
 - [Spec 05: Conditional Weighted PGM Sampler](03-conditional-weighted-pgm-sampler.md)
 - [Spec 06: Narrative Persona Field Provenance](06-narrative-persona-field-provenance.md)
+- [Spec 07: ABS G-Table Coverage Promotion](07-abs-g-table-coverage-promotion.md)
 
 `02-pgm-feature-marts.md` predates the semantic-layer split and should be
 treated as downstream until Spec 02 and Spec 03 are implemented and the first
