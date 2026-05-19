@@ -1,11 +1,12 @@
 # Spec 02: First PGM Feature Marts
 
-> Status: downstream / not the next implementation target.
+> Status: historical backlog / not the next implementation target.
 >
 > This spec predates the semantic-layer split. Do not implement the full mart
 > list until `Specs/02-census-semantic-topic-layer.md` exists in code and the
 > first SA2 semantic topics have been inspected. The first rewritten tranche
-> should be smaller and should promote only proven semantic topics.
+> is `Specs/04-first-pgm-feature-marts.md`; keep the broad list here as
+> follow-up backlog only.
 
 ## Goal
 

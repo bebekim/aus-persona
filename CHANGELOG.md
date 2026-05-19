@@ -18,3 +18,5 @@ Repository changes worth human review should be summarized here.
   tenure, industry, defence-service, and guarded Indigenous-status context.
 - Defined the promotion gate from semantic Census topic to materialized PGM mart,
   including non-promotion criteria and required mart tests.
+- Added a smaller first-tranche PGM mart spec scoped to age/sex, personal
+  income, and labour-force status.
