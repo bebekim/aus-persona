@@ -22,3 +22,6 @@ Repository changes worth human review should be summarized here.
   income, and labour-force status.
 - Implemented first sampler-facing PGM marts for SA2 age/sex and personal
   income with probability, eligibility, lineage, and Rockbank smoke tests.
+- Added Step 1 PGM structured seed export with labour-force status,
+  conditional sampling, trace/provenance JSON, and low-information category
+  guards.

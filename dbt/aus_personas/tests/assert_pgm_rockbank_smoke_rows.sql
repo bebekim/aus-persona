@@ -15,12 +15,24 @@ with expected_rows as (
         where sa2_code = '213041359'
             and income_band is not null
     )
+
+    union all
+
+    select 'mart_pgm__sa2_labour_force_status' as mart_name
+    where exists (
+        select 1
+        from {{ ref('mart_pgm__sa2_labour_force_status') }}
+        where sa2_code = '213041359'
+            and labour_force_status is not null
+    )
 ),
 
 required_rows as (
     select 'mart_pgm__sa2_age_sex' as mart_name
     union all
     select 'mart_pgm__sa2_personal_income' as mart_name
+    union all
+    select 'mart_pgm__sa2_labour_force_status' as mart_name
 )
 
 select required_rows.mart_name

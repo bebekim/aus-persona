@@ -24,6 +24,20 @@ duplicate_income as (
     from {{ ref('mart_pgm__sa2_personal_income') }}
     group by 1, 2, 3, 4, 5, 6
     having count(*) > 1
+),
+
+duplicate_labour as (
+    select
+        'mart_pgm__sa2_labour_force_status' as mart_name,
+        census_year,
+        sa2_code,
+        age_band,
+        sex,
+        labour_force_status as income_band,
+        count(*) as row_count
+    from {{ ref('mart_pgm__sa2_labour_force_status') }}
+    group by 1, 2, 3, 4, 5, 6
+    having count(*) > 1
 )
 
 select *
@@ -31,3 +45,6 @@ from duplicate_age_sex
 union all
 select *
 from duplicate_income
+union all
+select *
+from duplicate_labour

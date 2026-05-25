@@ -125,3 +125,68 @@ models:
       - name: source_label
         data_tests:
           - not_null
+
+
+  - name: mart_pgm__sa2_labour_force_status
+    description: >
+      Sampler-facing labour force status distribution by SA2, age band, and sex
+      from G46.
+    columns:
+      - name: census_year
+        data_tests:
+          - not_null
+      - name: geography_level
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["sa2"]
+      - name: sa2_code
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_sa2')
+                field: sa2_code
+      - name: feature_name
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["labour_force_status"]
+      - name: feature_value
+        data_tests:
+          - not_null
+      - name: age_band
+        data_tests:
+          - not_null
+      - name: sex
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["Male", "Female"]
+      - name: labour_force_status
+        data_tests:
+          - not_null
+      - name: count
+        data_tests:
+          - not_null
+      - name: denominator_count
+        data_tests:
+          - not_null
+      - name: probability_within_partition
+        data_tests:
+          - not_null
+      - name: source_logical_table
+        data_tests:
+          - not_null
+      - name: source_physical_table
+        data_tests:
+          - not_null
+      - name: source_raw_column
+        data_tests:
+          - not_null
+      - name: source_label
+        data_tests:
+          - not_null

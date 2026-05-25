@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import random
 import sys
 from pathlib import Path
 
@@ -38,6 +39,7 @@ from aus_personas.sample_sizes import (
     SAMPLE_SIZE_PRESETS,
     resolve_sample_size,
 )
+from aus_personas.sampler.weighted_sampler import generate_seed_profiles
 
 
 def main() -> None:
@@ -111,6 +113,30 @@ def main() -> None:
         "--project",
         type=Path,
         default=DEFAULT_DBT_PROJECT,
+    )
+
+
+    pgm_parser = subparsers.add_parser(
+        "pgm",
+        help="Run PGM structured seed profile commands.",
+    )
+    pgm_subparsers = pgm_parser.add_subparsers(
+        dest="pgm_command",
+        required=True,
+    )
+    seed_parser = pgm_subparsers.add_parser(
+        "seed-profiles",
+        help="Generate ABS-backed structured seed profiles from PGM marts.",
+    )
+    seed_parser.add_argument("--schema", default="aus_personas_dbt")
+    seed_parser.add_argument("--container", default="censusloader-postgres")
+    seed_parser.add_argument("--sa2", dest="sa2_code", default=None)
+    seed_parser.add_argument("--sample-size", type=int, default=10)
+    seed_parser.add_argument("--seed", type=int, default=1)
+    seed_parser.add_argument(
+        "--format",
+        choices=("table", "csv", "jsonl"),
+        default="csv",
     )
 
     census_parser = subparsers.add_parser(
@@ -247,6 +273,8 @@ def main() -> None:
         render_dbt_config(args.config, args.output, args.project)
         print(f"Rendered dbt sources to {args.output}")
         print(f"Rendered dbt source vars to {args.project}")
+    elif args.command == "pgm":
+        run_pgm_command(args)
     elif args.command == "census":
         run_census_command(args)
 
@@ -378,6 +406,87 @@ def run_census_command(args: argparse.Namespace) -> None:
     rows = run_psql_csv(sql, container=options.container)
     write_rows(rows, args.format)
 
+
+
+def run_pgm_command(args: argparse.Namespace) -> None:
+    if args.pgm_command != "seed-profiles":
+        raise ValueError(f"Unsupported pgm command: {args.pgm_command}")
+
+    age_rows = run_psql_csv(
+        pgm_mart_sql(
+            args.schema,
+            "mart_pgm__sa2_age_sex",
+            [
+                "census_year",
+                "sa2_code",
+                "sa2_name",
+                "state_name",
+                "age_band",
+                "sex",
+                "count",
+                "probability_within_partition",
+            ],
+            args.sa2_code,
+        ),
+        container=args.container,
+    )
+    labour_rows = run_psql_csv(
+        pgm_mart_sql(
+            args.schema,
+            "mart_pgm__sa2_labour_force_status",
+            [
+                "sa2_code",
+                "age_band",
+                "sex",
+                "labour_force_status",
+                "count",
+                "probability_within_partition",
+            ],
+            args.sa2_code,
+        ),
+        container=args.container,
+    )
+    income_rows = run_psql_csv(
+        pgm_mart_sql(
+            args.schema,
+            "mart_pgm__sa2_personal_income",
+            [
+                "sa2_code",
+                "age_band",
+                "sex",
+                "income_band",
+                "count",
+                "probability_within_partition",
+            ],
+            args.sa2_code,
+        ),
+        container=args.container,
+    )
+    profiles = generate_seed_profiles(
+        age_sex_rows=age_rows,
+        labour_rows=labour_rows,
+        income_rows=income_rows,
+        sample_size=args.sample_size,
+        rng=random.Random(args.seed),
+    )
+    write_rows(profiles, args.format)
+
+
+def pgm_mart_sql(
+    schema: str,
+    mart_name: str,
+    columns: list[str],
+    sa2_code: str | None,
+) -> str:
+    quoted_columns = ", ".join(columns)
+    sql = f"select {quoted_columns} from {schema}.{mart_name}"
+    if sa2_code:
+        sql += f" where sa2_code = {sql_quote(sa2_code)}"
+    return sql
+
+
+def sql_quote(value: str) -> str:
+    return "'" + value.replace("'", "''") + "'"
 
 def normalise_limit(limit: int | None) -> int | None:
     if limit == 0:
