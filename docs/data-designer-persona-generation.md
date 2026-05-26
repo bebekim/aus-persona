@@ -50,7 +50,7 @@ configs/data_designer/persona_text_config.py
 It reads seed rows from:
 
 ```text
-examples/seeds/rockbank_seed_sample.csv
+examples/seeds/rockbank_pgm_seed_sample.csv
 ```
 
 Override the seed file:
@@ -80,12 +80,68 @@ uv run data-designer create configs/data_designer/persona_text_config.py \
   --artifact-path artifacts/data_designer
 ```
 
-## Design Choice
+## Bridge Contract
 
-The config currently generates one structured `persona_bundle` object rather
-than thirteen separate LLM columns. That keeps one LLM call per seed row and
-reduces cost. A later flattening step should expand `persona_bundle` into the
-final Korea-style columns.
+The config consumes PGM structured seed rows directly. The fixed input columns
+are:
+
+- `profile_id`
+- `census_year`
+- `sa2_code`
+- `sa2_name`
+- `state_name`
+- `age_band`
+- `sex`
+- `labour_force_status`
+- `income_band`
+- `country_of_birth`
+- `language_used_at_home`
+- `english_proficiency`
+- `household_relationship`
+- `pgm_trace_json`
+- `provenance_json`
+
+Data Designer generates one structured `persona_bundle` object instead of
+separate LLM columns. That keeps one LLM call per seed row and reduces cost.
+The bundle contains only generated narrative fields:
+
+- `professional_persona`
+- `family_persona`
+- `skills_and_expertise`
+- `skills_and_expertise_list`
+- `hobbies_and_interests`
+- `hobbies_and_interests_list`
+- `career_goals_and_ambitions`
+- `persona`
+
+Use `aus_personas.sampler.validation.build_final_persona_row(seed_row,
+generated_row)` to flatten a Data Designer row into the final export shape.
+The helper copies all structured PGM fields from the seed row, expands
+`persona_bundle`, preserves `pgm_trace_json` and `provenance_json`, and appends
+`validation_status` plus `validation_errors_json`.
+
+The machine-readable final-field provenance contract lives in:
+
+```text
+src/aus_personas/persona_fields.py
+```
+
+Narrative fields are marked `generated_constrained`; they are not
+`sampled_from_abs`.
+
+## Validators
+
+Post-generation validators fail the row when generated text:
+
+- mentions an age outside `age_band`;
+- describes current work when `labour_force_status` is not employed;
+- exposes the exact `income_band` as prose;
+- claims ABS or Census provenance for generated narrative fields;
+- describes an Australia-born seed as a recent migrant;
+- contradicts English-at-home seed context;
+- contradicts lone-person household context;
+- leaves generated narrative fields empty;
+- attempts to change fixed structured fields.
 
 ## Boundary
 

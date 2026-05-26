@@ -36,18 +36,22 @@ Ready:
 - The Tier 2 PGM marts expose sampler-facing probability distributions for
   country of birth, language used at home with English proficiency, and
   household relationship.
+- The Data Designer config consumes PGM seed rows from the structured sampler
+  schema and generates narrative-only `persona_bundle` output.
+- Post-generation helpers flatten `persona_bundle`, preserve PGM trace and
+  provenance JSON, and emit validation status/errors.
 
 Not ready:
 
-- There is no Data Designer seed dataset export contract.
-- There is no Data Designer config that consumes PGM seed rows.
-- There are no validators for narrative contradictions or provenance leakage.
+- No production-scale Data Designer artifact has been generated and reviewed.
+- The first preview dataset is limited to the Rockbank PGM seed sample.
 
 Conclusion:
 
 ```text
 Silver is ready enough for Step 1 implementation to continue.
-Silver is not yet ready as a final Data Designer input surface.
+Silver is ready as a first Data Designer input surface.
+The final generated dataset still needs an artifact run and review.
 ```
 
 ## Step 1: Produce ABS-Backed Structured Seed Profiles

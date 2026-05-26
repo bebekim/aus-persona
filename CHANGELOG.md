@@ -28,3 +28,6 @@ Repository changes worth human review should be summarized here.
 - Added Tier 2 PGM structured seed fields for country of birth,
   language/proficiency, and household relationship, with sampler-facing marts,
   probability tests, and seed export provenance.
+- Added the PGM-seed Data Designer bridge, final persona field provenance
+  contract, and post-generation validators for narrative contradictions and
+  provenance leakage.

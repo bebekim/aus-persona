@@ -12,49 +12,34 @@ from pathlib import Path
 
 import data_designer.config as dd
 
+from aus_personas.persona_fields import GENERATED_NARRATIVE_FIELDS
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_SEED_PATH = REPO_ROOT / "examples" / "seeds" / "rockbank_seed_sample.csv"
+DEFAULT_SEED_PATH = REPO_ROOT / "examples" / "seeds" / "rockbank_pgm_seed_sample.csv"
+
+
+STRING_NARRATIVE_FIELDS = [
+    field for field in GENERATED_NARRATIVE_FIELDS if not field.endswith("_list")
+]
+LIST_NARRATIVE_FIELDS = [
+    field for field in GENERATED_NARRATIVE_FIELDS if field.endswith("_list")
+]
 
 
 PERSONA_BUNDLE_SCHEMA = {
     "type": "object",
     "properties": {
-        "professional_persona": {"type": "string"},
-        "sports_persona": {"type": "string"},
-        "arts_persona": {"type": "string"},
-        "travel_persona": {"type": "string"},
-        "culinary_persona": {"type": "string"},
-        "family_persona": {"type": "string"},
-        "persona": {"type": "string"},
-        "cultural_background": {"type": "string"},
-        "skills_and_expertise": {"type": "string"},
-        "skills_and_expertise_list": {
-            "type": "array",
-            "items": {"type": "string"},
+        **{field: {"type": "string"} for field in STRING_NARRATIVE_FIELDS},
+        **{
+            field: {
+                "type": "array",
+                "items": {"type": "string"},
+            }
+            for field in LIST_NARRATIVE_FIELDS
         },
-        "hobbies_and_interests": {"type": "string"},
-        "hobbies_and_interests_list": {
-            "type": "array",
-            "items": {"type": "string"},
-        },
-        "career_goals_and_ambitions": {"type": "string"},
     },
-    "required": [
-        "professional_persona",
-        "sports_persona",
-        "arts_persona",
-        "travel_persona",
-        "culinary_persona",
-        "family_persona",
-        "persona",
-        "cultural_background",
-        "skills_and_expertise",
-        "skills_and_expertise_list",
-        "hobbies_and_interests",
-        "hobbies_and_interests_list",
-        "career_goals_and_ambitions",
-    ],
+    "required": GENERATED_NARRATIVE_FIELDS,
     "additionalProperties": False,
 }
 
@@ -67,32 +52,29 @@ Avoid stereotypes, slurs, deterministic claims, and named real private people.
 """
 
 
-PERSONA_PROMPT = """Expand this fixed structured seed into Korea-style persona
-text fields.
+PERSONA_PROMPT = """Create concise Australian persona narrative fields from the
+fixed demographic scaffold. Do not change the scaffold. Do not mention exact
+Census counts. Do not claim hobbies, skills, personality, or ambitions are
+Census-derived. Avoid inferring protected or sensitive attributes not present in
+the scaffold.
 
 Seed:
-- uuid: {{ uuid }}
+- profile_id: {{ profile_id }}
 - SA2: {{ sa2_name }} ({{ sa2_code }})
-- state: {{ state }}
-- country: {{ country }}
-- age: {{ age }}
+- state: {{ state_name }}
+- census_year: {{ census_year }}
+- age_band: {{ age_band }}
 - sex: {{ sex }}
-- marital_status: {{ marital_status }}
-- family_type: {{ family_type }}
-- housing_type: {{ housing_type }}
-- education_level: {{ education_level }}
-- field_of_study: {{ field_of_study }}
 - labour_force_status: {{ labour_force_status }}
-- occupation: {{ occupation }}
 - income_band: {{ income_band }}
-- language_home: {{ language_home }}
 - country_of_birth: {{ country_of_birth }}
-- ancestry_1: {{ ancestry_1 }}
-- ancestry_2: {{ ancestry_2 }}
-- indigenous_status: {{ indigenous_status }}
+- language_used_at_home: {{ language_used_at_home }}
+- english_proficiency: {{ english_proficiency }}
+- household_relationship: {{ household_relationship }}
 
 Write concise but specific fields. Keep the overall persona realistic for the
-seed and location. The list fields must be arrays of short strings.
+seed and location. The list fields must be arrays of short strings. The output
+must contain only narrative fields from the requested schema.
 """
 
 
