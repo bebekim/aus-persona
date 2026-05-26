@@ -88,6 +88,36 @@ def test_decodes_language_and_english_proficiency_axes():
     }
 
 
+def test_decodes_other_language_without_abs_prefix():
+    decoded = decode_metadata_row(
+        MetadataRow(
+            sequential_id="G4610",
+            short_id="MOL_CL_Canton_UOLSE_VWorW",
+            long_id=(
+                "MALES_Uses_other_language_Chinese_languages_Cantonese_"
+                "Uses_other_language_and_speaks_English_Very_well_or_well"
+            ),
+            table_number="G13A",
+            profile_table="G13a",
+            column_heading_description=(
+                "Uses other language and speaks English: Very well or well|MALES"
+            ),
+            logical_table_name=(
+                "Language Used at Home by Proficiency in Spoken English by Sex"
+            ),
+            population_universe="Persons",
+        )
+    )
+
+    assert decoded.category_axis == "language_used_at_home"
+    assert decoded.category == "Chinese languages Cantonese"
+    assert json.loads(decoded.axes_json) == {
+        "english_proficiency": "Very well or well",
+        "language_used_at_home": "Chinese languages Cantonese",
+        "sex": "Male",
+    }
+
+
 def test_decodes_defence_service_status_column():
     decoded = decode_metadata_row(
         MetadataRow(
@@ -140,6 +170,33 @@ def test_decodes_household_composition_and_size_axes():
     assert json.loads(decoded.axes_json) == {
         "household_composition": "One family household: Couple family with children",
         "household_size": "Four persons usually resident",
+    }
+
+
+def test_decodes_household_relationship_from_long_id_when_label_is_age():
+    decoded = decode_metadata_row(
+        MetadataRow(
+            sequential_id="G8643",
+            short_id="F_Partner_registered_marriage_15_24",
+            long_id="FEMALES_Partner_in_a_registered_marriage_Age_15_24_years",
+            table_number="G27A",
+            profile_table="G27a",
+            column_heading_description="Age: 15-24 years|FEMALES",
+            logical_table_name="Relationship in Household by Age by Sex",
+            population_universe="Persons",
+        )
+    )
+
+    assert decoded.logical_table_code == "G27"
+    assert decoded.physical_table == "sa2_g27a"
+    assert decoded.sex == "Female"
+    assert decoded.age_band == "15-24"
+    assert decoded.category_axis == "household_relationship"
+    assert decoded.category == "Partner in a registered marriage"
+    assert json.loads(decoded.axes_json) == {
+        "age_band": "15-24",
+        "household_relationship": "Partner in a registered marriage",
+        "sex": "Female",
     }
 
 

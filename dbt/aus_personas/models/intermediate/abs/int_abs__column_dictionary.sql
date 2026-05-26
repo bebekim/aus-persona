@@ -63,6 +63,7 @@ joined as (
             when s.logical_table_code = 'G09' then nullif(replace(substring(s.long_id from '^(?:MALES|FEMALES|PERSONS)_(.*?)_Age_'), '_', ' '), 'Total')
             when s.logical_table_code = 'G13' then {{ clean_abs_category("nullif(replace((regexp_match(s.long_id, '^(?:MALES|FEMALES|PERSONS)_(.*?)_(Speaks_English_only|Uses_other_language_and_speaks_English_Very_well_or_well|Uses_other_language_and_speaks_English_Not_well_or_not_at_all|Uses_other_language_and_speaks_English_Total|Not_stated|Total)$'))[1], '_', ' '), 'Total')", "s.logical_table_code") }}
             when s.logical_table_code = 'G17' then {{ clean_abs_category("nullif(replace(substring(s.long_id from '^(?:MALES|FEMALES|PERSONS)_(.*?)_Age_'), '_', ' '), 'Total')", "s.logical_table_code") }}
+            when s.logical_table_code = 'G27' then {{ clean_abs_category("nullif(replace(regexp_replace(regexp_replace(s.long_id, '^(?:MALES|FEMALES|PERSONS)_', ''), '_Age_[0-9]+(?:_[0-9]+)?_years(?:_and_over)?$', ''), '_', ' '), 'Total')", "s.logical_table_code") }}
             when s.logical_table_code = 'G54' then {{ clean_abs_category("nullif(replace(substring(s.long_id from '^(?:MALES|FEMALES|PERSONS)_(.*?)_Age_'), '_', ' '), 'Total')", "s.logical_table_code") }}
             else {{ clean_abs_category("split_part(s.source_label, '|', 1)", "s.logical_table_code") }}
         end as category,

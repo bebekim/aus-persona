@@ -25,3 +25,6 @@ Repository changes worth human review should be summarized here.
 - Added Step 1 PGM structured seed export with labour-force status,
   conditional sampling, trace/provenance JSON, and low-information category
   guards.
+- Added Tier 2 PGM structured seed fields for country of birth,
+  language/proficiency, and household relationship, with sampler-facing marts,
+  probability tests, and seed export provenance.

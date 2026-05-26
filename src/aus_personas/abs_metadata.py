@@ -317,7 +317,7 @@ def parse_primary_category(
 def clean_category(logical_code: str, value: str) -> str:
     cleaned = value.strip()
     prefixes_to_strip = {
-        "G13": ("Language:",),
+        "G13": ("Language:", "Uses other language "),
         "G14": ("Religion:", "Religious affiliation:"),
         "G16": ("Highest year of school completed:",),
         "G17": ("Income:", "Personal income:"),

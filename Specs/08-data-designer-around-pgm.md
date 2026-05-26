@@ -31,14 +31,14 @@ Ready:
   geography into a reusable long fact table.
 - `configs/abs_semantic_tables.yml` records sampler guardrails for promoted
   semantic topics.
-- `mart_pgm__sa2_age_sex` and `mart_pgm__sa2_personal_income` already expose
-  sampler-facing probability distributions.
+- The Tier 1 PGM marts expose sampler-facing probability distributions for
+  age/sex, personal income, and labour-force status.
+- The Tier 2 PGM marts expose sampler-facing probability distributions for
+  country of birth, language used at home with English proficiency, and
+  household relationship.
 
 Not ready:
 
-- `mart_pgm__sa2_labour_force_status` is still missing, so Tier 1 is not
-  complete.
-- There is no materialized sampler output table/file yet.
 - There is no Data Designer seed dataset export contract.
 - There is no Data Designer config that consumes PGM seed rows.
 - There are no validators for narrative contradictions or provenance leakage.
@@ -60,6 +60,9 @@ Inputs:
 mart_pgm__sa2_age_sex
 mart_pgm__sa2_personal_income
 mart_pgm__sa2_labour_force_status
+mart_pgm__sa2_country_of_birth
+mart_pgm__sa2_language_home_english_proficiency
+mart_pgm__sa2_household_relationship
 ```
 
 Required output fields:
@@ -74,6 +77,10 @@ age_band
 sex
 labour_force_status
 income_band
+country_of_birth
+language_used_at_home
+english_proficiency
+household_relationship
 pgm_trace_json
 provenance_json
 ```
@@ -85,6 +92,9 @@ SA2
   -> age_band, sex
   -> labour_force_status | SA2, age_band, sex
   -> income_band | SA2, age_band, sex
+  -> country_of_birth | SA2, age_band, sex
+  -> language_used_at_home, english_proficiency | SA2, sex
+  -> household_relationship | SA2, age_band, sex
 ```
 
 `pgm_trace_json` must record which mart and denominator partition supplied each
@@ -114,6 +124,10 @@ age_band
 sex
 labour_force_status
 income_band
+country_of_birth
+language_used_at_home
+english_proficiency
+household_relationship
 ```
 
 Generated narrative fields:
@@ -170,6 +184,10 @@ age_band
 sex
 labour_force_status
 income_band
+country_of_birth
+language_used_at_home
+english_proficiency
+household_relationship
 professional_persona
 family_persona
 skills_and_expertise
@@ -186,7 +204,7 @@ validation_errors_json
 
 ## Tier 1 / 2 / 3 Boundary
 
-Tier 1 is the only part required before Data Designer integration:
+Tier 1 is the first structured spine:
 
 ```text
 SA2
@@ -196,7 +214,7 @@ labour_force_status
 income_band
 ```
 
-Tier 2 remains future structured context:
+Tier 2 is additional structured context sampled before Data Designer:
 
 ```text
 country_of_birth
@@ -216,23 +234,22 @@ family prose
 professional prose
 ```
 
-Data Designer starts at Tier 3. It can see Tier 1 and Tier 2 fields as context,
-but it does not own their sampling.
+Data Designer starts at Tier 3. It can see Tier 1 and Tier 2 fields as fixed
+context, but it does not own their sampling.
 
 ## Implementation Order
 
-1. Complete `mart_pgm__sa2_labour_force_status`.
-2. Build the Step 1 sampler/export that emits structured seed profiles.
-3. Add a Data Designer config that consumes seed profiles and generates Tier 3
+1. Build the Step 1 sampler/export that emits structured seed profiles.
+2. Add a Data Designer config that consumes seed profiles and generates Tier 3
    narrative fields.
-4. Add validators and provenance checks.
-5. Add a small preview job using Rockbank SA2 `213041359`.
+3. Add validators and provenance checks.
+4. Add a small preview job using Rockbank SA2 `213041359`.
 
 ## Acceptance Criteria
 
-- Tier 1 dbt marts build and pass probability tests.
+- Tier 1 and Tier 2 dbt marts build and pass probability tests.
 - A structured seed export exists and contains no generated narrative fields.
-- Data Designer consumes the seed export without changing Tier 1 fields.
+- Data Designer consumes the seed export without changing structured fields.
 - Generated narrative fields pass contradiction and provenance validators.
 - Final output contains `pgm_trace_json` and `provenance_json`.
 - Documentation states that ABS supports only the structured spine, not the

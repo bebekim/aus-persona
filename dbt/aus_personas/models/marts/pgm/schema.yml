@@ -190,3 +190,195 @@ models:
       - name: source_label
         data_tests:
           - not_null
+
+  - name: mart_pgm__sa2_country_of_birth
+    description: >
+      Sampler-facing country-of-birth distribution by SA2, age band, and sex
+      from G09.
+    columns:
+      - name: census_year
+        data_tests:
+          - not_null
+      - name: geography_level
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["sa2"]
+      - name: sa2_code
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_sa2')
+                field: sa2_code
+      - name: feature_name
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["country_of_birth"]
+      - name: feature_value
+        data_tests:
+          - not_null
+      - name: age_band
+        data_tests:
+          - not_null
+      - name: sex
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["Male", "Female"]
+      - name: country_of_birth
+        data_tests:
+          - not_null
+      - name: count
+        data_tests:
+          - not_null
+      - name: denominator_count
+        data_tests:
+          - not_null
+      - name: probability_within_partition
+        data_tests:
+          - not_null
+      - name: source_logical_table
+        data_tests:
+          - not_null
+      - name: source_physical_table
+        data_tests:
+          - not_null
+      - name: source_raw_column
+        data_tests:
+          - not_null
+      - name: source_label
+        data_tests:
+          - not_null
+
+  - name: mart_pgm__sa2_language_home_english_proficiency
+    description: >
+      Sampler-facing language used at home and English proficiency distribution
+      by SA2 and sex from G13.
+    columns:
+      - name: census_year
+        data_tests:
+          - not_null
+      - name: geography_level
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["sa2"]
+      - name: sa2_code
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_sa2')
+                field: sa2_code
+      - name: feature_name
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["language_home_english_proficiency"]
+      - name: feature_value
+        data_tests:
+          - not_null
+      - name: sex
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["Male", "Female"]
+      - name: language_used_at_home
+        data_tests:
+          - not_null
+      - name: english_proficiency
+        data_tests:
+          - not_null
+      - name: count
+        data_tests:
+          - not_null
+      - name: denominator_count
+        data_tests:
+          - not_null
+      - name: probability_within_partition
+        data_tests:
+          - not_null
+      - name: source_logical_table
+        data_tests:
+          - not_null
+      - name: source_physical_table
+        data_tests:
+          - not_null
+      - name: source_raw_column
+        data_tests:
+          - not_null
+      - name: source_label
+        data_tests:
+          - not_null
+
+  - name: mart_pgm__sa2_household_relationship
+    description: >
+      Sampler-facing household relationship distribution by SA2, age band, and
+      sex from G27.
+    columns:
+      - name: census_year
+        data_tests:
+          - not_null
+      - name: geography_level
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["sa2"]
+      - name: sa2_code
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_sa2')
+                field: sa2_code
+      - name: feature_name
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["household_relationship"]
+      - name: feature_value
+        data_tests:
+          - not_null
+      - name: age_band
+        data_tests:
+          - not_null
+      - name: sex
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["Male", "Female"]
+      - name: household_relationship
+        data_tests:
+          - not_null
+      - name: count
+        data_tests:
+          - not_null
+      - name: denominator_count
+        data_tests:
+          - not_null
+      - name: probability_within_partition
+        data_tests:
+          - not_null
+      - name: source_logical_table
+        data_tests:
+          - not_null
+      - name: source_physical_table
+        data_tests:
+          - not_null
+      - name: source_raw_column
+        data_tests:
+          - not_null
+      - name: source_label
+        data_tests:
+          - not_null

@@ -13,8 +13,19 @@ ABS Census wide tables
   -> flattened Korea-style dataset
 ```
 
-The structured seed row owns demographic truth. Data Designer receives those
-fixed fields and generates natural-language fields such as:
+The structured seed row owns demographic truth. Data Designer receives fixed
+fields including:
+
+- `age_band`
+- `sex`
+- `labour_force_status`
+- `income_band`
+- `country_of_birth`
+- `language_used_at_home`
+- `english_proficiency`
+- `household_relationship`
+
+Data Designer generates natural-language fields such as:
 
 - `professional_persona`
 - `sports_persona`

@@ -462,10 +462,61 @@ def run_pgm_command(args: argparse.Namespace) -> None:
         ),
         container=args.container,
     )
+    country_of_birth_rows = run_psql_csv(
+        pgm_mart_sql(
+            args.schema,
+            "mart_pgm__sa2_country_of_birth",
+            [
+                "sa2_code",
+                "age_band",
+                "sex",
+                "country_of_birth",
+                "count",
+                "probability_within_partition",
+            ],
+            args.sa2_code,
+        ),
+        container=args.container,
+    )
+    language_rows = run_psql_csv(
+        pgm_mart_sql(
+            args.schema,
+            "mart_pgm__sa2_language_home_english_proficiency",
+            [
+                "sa2_code",
+                "sex",
+                "language_used_at_home",
+                "english_proficiency",
+                "count",
+                "probability_within_partition",
+            ],
+            args.sa2_code,
+        ),
+        container=args.container,
+    )
+    household_relationship_rows = run_psql_csv(
+        pgm_mart_sql(
+            args.schema,
+            "mart_pgm__sa2_household_relationship",
+            [
+                "sa2_code",
+                "age_band",
+                "sex",
+                "household_relationship",
+                "count",
+                "probability_within_partition",
+            ],
+            args.sa2_code,
+        ),
+        container=args.container,
+    )
     profiles = generate_seed_profiles(
         age_sex_rows=age_rows,
         labour_rows=labour_rows,
         income_rows=income_rows,
+        country_of_birth_rows=country_of_birth_rows,
+        language_rows=language_rows,
+        household_relationship_rows=household_relationship_rows,
         sample_size=args.sample_size,
         rng=random.Random(args.seed),
     )

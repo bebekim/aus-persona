@@ -10,6 +10,8 @@ from decimal import Decimal
 from typing import Any
 
 Row = dict[str, Any]
+AGE_SEX_PARTITION_FIELDS = ("sa2_code", "age_band", "sex")
+LANGUAGE_PARTITION_FIELDS = ("sa2_code", "sex")
 
 
 def generate_seed_profiles(
@@ -17,6 +19,9 @@ def generate_seed_profiles(
     age_sex_rows: Iterable[Row],
     labour_rows: Iterable[Row],
     income_rows: Iterable[Row],
+    country_of_birth_rows: Iterable[Row],
+    language_rows: Iterable[Row],
+    household_relationship_rows: Iterable[Row],
     sample_size: int,
     rng: random.Random | None = None,
 ) -> list[Row]:
@@ -27,19 +32,29 @@ def generate_seed_profiles(
     rng = rng or random.Random()
     labour_by_partition = partition_rows(labour_rows)
     income_by_partition = partition_rows(income_rows)
+    country_by_partition = partition_rows(country_of_birth_rows)
+    language_by_partition = partition_rows(language_rows, LANGUAGE_PARTITION_FIELDS)
+    household_by_partition = partition_rows(household_relationship_rows)
     age_choices = [
         row
         for row in age_sex_rows
         if partition_key(row) in labour_by_partition
         and partition_key(row) in income_by_partition
+        and partition_key(row) in country_by_partition
+        and partition_key(row, LANGUAGE_PARTITION_FIELDS) in language_by_partition
+        and partition_key(row) in household_by_partition
     ]
 
     profiles: list[Row] = []
     for index in range(1, sample_size + 1):
         age_row = weighted_choice(age_choices, rng)
         partition = partition_key(age_row)
+        language_partition = partition_key(age_row, LANGUAGE_PARTITION_FIELDS)
         labour_row = weighted_choice(labour_by_partition[partition], rng)
         income_row = weighted_choice(income_by_partition[partition], rng)
+        country_row = weighted_choice(country_by_partition[partition], rng)
+        language_row = weighted_choice(language_by_partition[language_partition], rng)
+        household_row = weighted_choice(household_by_partition[partition], rng)
 
         profile = {
             "profile_id": f"pgm_{index:08d}",
@@ -51,6 +66,12 @@ def generate_seed_profiles(
             "sex": str(age_row["sex"]),
             "labour_force_status": str(labour_row["labour_force_status"]),
             "income_band": str(income_row["income_band"]),
+            "country_of_birth": str(country_row["country_of_birth"]),
+            "language_used_at_home": str(language_row["language_used_at_home"]),
+            "english_proficiency": str(language_row["english_proficiency"]),
+            "household_relationship": str(
+                household_row["household_relationship"]
+            ),
         }
         profile["pgm_trace_json"] = json.dumps(
             pgm_trace(profile), sort_keys=True, separators=(",", ":")
@@ -63,15 +84,21 @@ def generate_seed_profiles(
     return profiles
 
 
-def partition_rows(rows: Iterable[Row]) -> dict[tuple[str, str, str], list[Row]]:
-    partitions: dict[tuple[str, str, str], list[Row]] = defaultdict(list)
+def partition_rows(
+    rows: Iterable[Row],
+    fields: tuple[str, ...] = AGE_SEX_PARTITION_FIELDS,
+) -> dict[tuple[str, ...], list[Row]]:
+    partitions: dict[tuple[str, ...], list[Row]] = defaultdict(list)
     for row in rows:
-        partitions[partition_key(row)].append(row)
+        partitions[partition_key(row, fields)].append(row)
     return partitions
 
 
-def partition_key(row: Row) -> tuple[str, str, str]:
-    return (str(row["sa2_code"]), str(row["age_band"]), str(row["sex"]))
+def partition_key(
+    row: Row,
+    fields: tuple[str, ...] = AGE_SEX_PARTITION_FIELDS,
+) -> tuple[str, ...]:
+    return tuple(str(row[field]) for field in fields)
 
 
 def weighted_choice(rows: list[Row], rng: random.Random) -> Row:
@@ -125,6 +152,35 @@ def pgm_trace(profile: Row) -> dict[str, dict[str, Any]]:
                 "sex": profile["sex"],
             },
         },
+        "country_of_birth": {
+            "source_mart": "mart_pgm__sa2_country_of_birth",
+            "conditioned_on": ["sa2_code", "age_band", "sex"],
+            "sampled_fields": ["country_of_birth"],
+            "partition": {
+                "sa2_code": profile["sa2_code"],
+                "age_band": profile["age_band"],
+                "sex": profile["sex"],
+            },
+        },
+        "language_used_at_home": {
+            "source_mart": "mart_pgm__sa2_language_home_english_proficiency",
+            "conditioned_on": ["sa2_code", "sex"],
+            "sampled_fields": ["language_used_at_home", "english_proficiency"],
+            "partition": {
+                "sa2_code": profile["sa2_code"],
+                "sex": profile["sex"],
+            },
+        },
+        "household_relationship": {
+            "source_mart": "mart_pgm__sa2_household_relationship",
+            "conditioned_on": ["sa2_code", "age_band", "sex"],
+            "sampled_fields": ["household_relationship"],
+            "partition": {
+                "sa2_code": profile["sa2_code"],
+                "age_band": profile["age_band"],
+                "sex": profile["sex"],
+            },
+        },
     }
 
 
@@ -135,4 +191,8 @@ def structured_provenance() -> dict[str, str]:
         "sex": "sampled_from_abs",
         "labour_force_status": "sampled_from_abs",
         "income_band": "sampled_from_abs",
+        "country_of_birth": "sampled_from_abs",
+        "language_used_at_home": "sampled_from_abs",
+        "english_proficiency": "sampled_from_abs",
+        "household_relationship": "sampled_from_abs",
     }

@@ -10,7 +10,10 @@ PGM_MODEL_DIR = DBT_ROOT / "models/marts/pgm"
 def test_first_pgm_mart_files_are_declared():
     required_models = {
         "mart_pgm__sa2_age_sex",
+        "mart_pgm__sa2_country_of_birth",
+        "mart_pgm__sa2_household_relationship",
         "mart_pgm__sa2_labour_force_status",
+        "mart_pgm__sa2_language_home_english_proficiency",
         "mart_pgm__sa2_personal_income",
     }
 

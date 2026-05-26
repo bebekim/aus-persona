@@ -77,6 +77,17 @@ def test_dbt_category_cleaning_handles_g17_income_prefixes():
     assert "_Age_'), '_', ' ')" in dictionary_sql
 
 
+def test_dbt_category_cleaning_handles_g13_language_prefixes():
+    macro_sql = Path("dbt/aus_personas/macros/abs/parse_abs_axis_helpers.sql").read_text()
+    dictionary_sql = Path(
+        "dbt/aus_personas/models/intermediate/abs/int_abs__column_dictionary.sql"
+    ).read_text()
+
+    assert "when s.logical_table_code = 'G13'" in dictionary_sql
+    assert "Uses_other_language_and_speaks_English" in dictionary_sql
+    assert "^Uses other language\\s+" in macro_sql
+
+
 def test_loads_semantic_catalog():
     catalog = load_semantic_catalog(Path("configs/abs_semantic_tables.yml"))
 

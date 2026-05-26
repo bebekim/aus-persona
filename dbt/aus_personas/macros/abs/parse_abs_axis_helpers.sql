@@ -35,7 +35,7 @@ nullif(
             when {{ logical_code_expr }} in ('G50') then regexp_replace({{ category_expr }}, '^Field of study:\s*', '', 'i')
             when {{ logical_code_expr }} in ('G36') then regexp_replace({{ category_expr }}, '^Dwelling structure:\s*', '', 'i')
             when {{ logical_code_expr }} in ('G17') then regexp_replace(regexp_replace({{ category_expr }}, '^Personal income:\s*', '', 'i'), '^Income:\s*', '', 'i')
-            when {{ logical_code_expr }} in ('G13') then regexp_replace({{ category_expr }}, '^Language:\s*', '', 'i')
+            when {{ logical_code_expr }} in ('G13') then regexp_replace(regexp_replace({{ category_expr }}, '^Language:\s*', '', 'i'), '^Uses other language\s+', '', 'i')
             else {{ category_expr }}
         end
     ),
