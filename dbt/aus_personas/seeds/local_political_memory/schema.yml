@@ -57,3 +57,99 @@ seeds:
       - name: required_fields
         data_tests:
           - not_null
+
+  - name: willoughby_2024_candidate_vote_rows
+    description: >
+      Harvested NSW Electoral Commission first-preference vote rows for the
+      2024 Willoughby mayoral and ward councillor contests. Councillor contests
+      include both above-the-line group vote rows and named candidate vote rows
+      because the official proportional representation report separates them.
+    config:
+      tags: ["local", "willoughby", "political_memory", "election_results"]
+    columns:
+      - name: result_id
+        data_tests:
+          - not_null
+          - unique
+      - name: council_slug
+        data_tests:
+          - not_null
+      - name: election_year
+        data_tests:
+          - not_null
+      - name: contest_type
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["mayoral", "councillor"]
+      - name: ballot_line_type
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["candidate", "above_the_line"]
+      - name: first_preference_votes
+        data_tests:
+          - not_null
+      - name: total_formal_votes
+        data_tests:
+          - not_null
+      - name: source_url
+        data_tests:
+          - not_null
+
+  - name: willoughby_2025_council_motion_vote_outcomes
+    description: >
+      Harvested Willoughby City Council CivicClerk motion-vote outcome rows for
+      the 15 September 2025 Ordinary Council Meeting. Rows represent recorded
+      motion outcomes, not resident votes; en bloc resolutions are preserved as
+      carried outcomes without named councillor vote lists.
+    config:
+      tags: ["local", "willoughby", "political_memory", "meeting_votes"]
+    columns:
+      - name: vote_outcome_id
+        data_tests:
+          - not_null
+          - unique
+      - name: council_slug
+        data_tests:
+          - not_null
+      - name: meeting_date
+        data_tests:
+          - not_null
+      - name: civicclerk_event_id
+        data_tests:
+          - not_null
+      - name: agenda_object_item_id
+        data_tests:
+          - not_null
+      - name: action_type
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - Motion
+                  - Resolution En Bloc
+                  - Procedural Motion
+                  - Amendment
+      - name: vote_result
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - Carried
+                  - Lost
+      - name: named_vote_available
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - "true"
+                  - "false"
+      - name: source_url
+        data_tests:
+          - not_null

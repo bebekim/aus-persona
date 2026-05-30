@@ -16,6 +16,7 @@ wheels/
 
 # Local agent/runtime artifacts
 .sandcastle/
+.agent-learning/
 .DS_Store
 
 # dbt local artifacts

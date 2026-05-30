@@ -17,6 +17,26 @@ The starter source registry lives in:
 
 `dbt/aus_personas/seeds/local_political_memory/willoughby_political_sources.csv`
 
+The first harvested election fact seed lives in:
+
+`dbt/aus_personas/seeds/local_political_memory/willoughby_2024_candidate_vote_rows.csv`
+
+It stores the 2024 NSW Electoral Commission first-preference vote rows for the
+Willoughby mayoral contest and each ward councillor contest. Ward councillor
+contests include `above_the_line` group rows as well as `candidate` rows because
+the official proportional representation report separates those vote types.
+
+The first harvested council meeting outcome seed lives in:
+
+`dbt/aus_personas/seeds/local_political_memory/willoughby_2025_council_motion_vote_outcomes.csv`
+
+It stores CivicClerk `PortalMotionVotes` rows for the 15 September 2025
+Ordinary Council Meeting. Each row is a council motion outcome: action type,
+mover, seconder, carried/lost result, and named for/against councillor lists
+when the endpoint records them. `Resolution En Bloc` rows are preserved as
+carried outcomes with `named_vote_available=false`; they must not be converted
+into unanimous named votes.
+
 | Family | Primary authority | Intended coverage |
 | --- | --- | --- |
 | `election_results` | NSW Electoral Commission | Mayoral and ward councillor election contests |
@@ -27,6 +47,27 @@ The starter source registry lives in:
 The election timeline should use the actual NSW local government election
 cycles. For Willoughby, the modern sequence is 2004, 2008, 2012, 2017, 2021,
 and 2024. The 2020 ordinary election was postponed and held in December 2021.
+
+## Meeting Outcome Semantics
+
+Agenda papers show what councillors are scheduled to consider. Minutes and
+CivicClerk motion-vote records show what the elected council actually decided.
+For policy memory, `Carried` means the motion was accepted as a council
+resolution, while `Lost` means it was not adopted. This is the best direct
+signal that a council-level policy proposal was accepted or rejected by elected
+representatives.
+
+That does not translate into a resident vote. NSW local government elections
+choose the mayor and councillors; ordinary meeting votes are decisions by those
+elected representatives. A `Notice of Motion` is a formal councillor proposal,
+but it becomes a council position only if the motion outcome is `Carried`.
+
+For the 15 September 2025 meeting, the harvested CivicClerk rows contain 38
+motion outcomes: 37 carried and 1 lost. Examples include the Risk Management
+Policy Review carried with 12 named votes for and no named votes against, and
+Notice of Motion 40/2025 lost with 4 named votes for and 7 named votes against.
+The same notice also has a separate procedural motion carried 10 to 1, so the
+memory layer keeps each motion outcome as its own row.
 
 ## Event Contracts
 
@@ -86,6 +127,19 @@ The first marts should use these grains:
 6. Harvest Willoughby Local Planning Panel determinations separately.
 7. Add curated issue tags such as housing, transport, open space, tree canopy,
    rates, active transport, accessibility, and community facilities.
+
+## Official Source Links
+
+- Council meetings and current agendas/minutes:
+  `https://www.willoughby.nsw.gov.au/Council/Council-meetings`
+- Agenda and minutes archive:
+  `https://www.willoughby.nsw.gov.au/Council/Council-meetings/General-Council-meetings`
+- 15 September 2025 Ordinary Council Meeting:
+  `https://www.willoughby.nsw.gov.au/Council/Council-meetings/General-information-Public-and-Open-Forums-and-Council-Meetings/Agendas-Minutes/15-September-2025`
+- CivicClerk player for event 159:
+  `https://willoughby.civicclerk.com.au/web/Player.aspx?id=159&key=-1&mod=-1&mk=-1&nov=0`
+- CivicClerk motion-vote endpoint pattern:
+  `https://willoughby.civicclerk.com.au/web/Dialogs/SubDialogs/PortalMotionVotes.aspx?id={agenda_object_item_id}`
 
 The useful first demo is not a complete scraper. It is a traceable memory card:
 for any proposed mayoral or council policy, show the relevant source records,
