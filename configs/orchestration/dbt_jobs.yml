@@ -11,7 +11,3 @@ dbt:
       description: Build interpreted G01 selected-person-characteristics semantic views.
       command: run
       selector: tag:g01
-    willoughby_local:
-      description: Build Willoughby City Council local hackathon marts.
-      command: run
-      selector: tag:willoughby

@@ -13,10 +13,6 @@ Use this directory for repository-specific context that should improve future ag
 - [Persona-Worthy SA2 Census Topics](persona-worthy-sa2-topics.md): defines
   which `sa2_g*` topics and columns should become sampler inputs, context, QA,
   or v1 exclusions for Korea-style persona rows.
-- [Willoughby Political Memory Layer](willoughby-political-memory-layer.md):
-  defines the source-backed local elections, council meeting, notice-of-motion,
-  and planning-determination layer that can contextualize persona cohorts for
-  policy makers and mayoral/council users.
 
 Recommended sections:
 

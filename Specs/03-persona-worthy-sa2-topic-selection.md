@@ -332,7 +332,7 @@ main source for individual persona sampling.
 | `G47` | Labour Force Status by Sex of Parents by Age of Dependent Children for Couple Families | Defer to family-specific modelling. |
 | `G48` | Labour Force Status by Sex of Parent by Age of Dependent Children for One Parent Families | Defer to family-specific modelling. |
 
-For a Willoughby/Chatswood hackathon MVP, use this reduced set:
+For a narrow local MVP, use this reduced set:
 
 ```text
 G04, G05, G08, G09, G13, G17, G27, G35, G36, G46, G49, G50, G60
@@ -620,8 +620,8 @@ selectors.
 - Household and dwelling distributions do not share the same grain as person
   distributions. Treat them as conditioning/context unless a defensible
   person-level allocation rule exists.
-- Overfitting to one SA2 can make the sampler brittle. Validate with a local SA2
-  such as Chatswood/Willoughby and a contrasting regional SA2.
+- Overfitting to one SA2 can make the sampler brittle. Validate with contrasting
+  metropolitan and regional SA2s.
 - G01 is tempting because it is already partly implemented, but it is too coarse
   for many final persona fields. Prefer detailed topics once available.
 - Data Designer should not invent structured demographics that the sampler has
